@@ -46,11 +46,20 @@ int main(void)
          
         if (IsKeyPressed(KEY_Q))
         {
-            map.setMeshPixelHeight(0, 2, 10);
+            map.setHeight(0, 2, 10);
         }
-        if (IsKeyDown(KEY_E))
+        if (IsKeyPressed(KEY_E))
         {
-            map.setMeshPixelHeight(0, 0, 5);
+            map.setHeight(0, 0, 5);
+        }
+        if (IsKeyPressed(KEY_R))
+        {
+            map.plotTerraform(2, 2, 2, true);
+            map.renderTerraformPlot();
+        }
+        if (IsKeyPressed(KEY_TAB))
+        {
+            map.switchTerraformDraw();
         }
 
         // Draw
@@ -69,8 +78,8 @@ int main(void)
         EndMode3D();
 
         //minimap
-        /*DrawTexture(texture, screenWidth - texture.width - 20, 20, WHITE);
-        DrawRectangleLines(screenWidth - texture.width - 20, 20, texture.width, texture.height, GREEN);*/
+        /*DrawTexture(texture, screenWidth - width - 20, 20, WHITE);
+        DrawRectangleLines(screenWidth - width - 20, 20, width, height, GREEN);*/
 
         DrawFPS(10, 10);
 
