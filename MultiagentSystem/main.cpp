@@ -1,6 +1,6 @@
 #include "include/raylib.h"
-#include <random>
 #include "Map.h"
+#include "CustomCamera.h"
 
 constexpr float FOVY_PERSPECTIVE = 45.0f;
 constexpr float WIDTH_ORTHOGRAPHIC = 10.0f;
@@ -18,9 +18,11 @@ int main(void)
 
     // Define our custom camera to look into our 3d world
     Vector2 mapSize = map.getMapSize();
-    Camera camera = { { 18.0f, 18.0f, 18.0f }, { mapSize.x/2, 0.0f, mapSize.y/2 }, { 0.0f, 1.0f, 0.0f }, 45.0f, 0 };
-    //SetCameraMode(camera, CAMERA_THIRD_PERSON);  // Set an orbital camera mode CAMERA_THIRD_PERSON
-    SetCameraMode(camera, CAMERA_FREE);
+    //Camera camera = { { 18.0f, 18.0f, 18.0f }, { mapSize.x/2, 0.0f, mapSize.y/2 }, { 0.0f, 1.0f, 0.0f }, 45.0f, CAMERA_PERSPECTIVE };
+    
+    CustomCamera camera = CustomCamera({ 18.0f, 18.0f, 18.0f }, { mapSize.x / 2, 0.0f, mapSize.y / 2 }, { 0.0f, 1.0f, 0.0f }, 45.0f, CAMERA_PERSPECTIVE, { screenWidth, screenHeight});
+    //SetCameraMode(camera, CAMERA_ORBITAL);  // Set an orbital camera mode CAMERA_THIRD_PERSON
+    //SetCameraMode(camera.getCamera(), CAMERA_FREE);
 
     Vector3 cubePosition = { 0.0f, 1.0f, 0.0f };
     Vector3 cubeSize = { 2.0f, 2.0f, 2.0f };
@@ -37,11 +39,12 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-        UpdateCamera(&camera);              // Update camera
+        //UpdateCamera(&camera.getCamera());              // Update camera
+        camera.Update();
 
-        if (IsKeyPressed(KEY_SPACE))
+        /*if (IsKeyPressed(KEY_SPACE))
         {
-            if (camera.projection == CAMERA_PERSPECTIVE)
+            if (camera.getCamera().projection == CAMERA_PERSPECTIVE)
             {
                 camera.fovy = WIDTH_ORTHOGRAPHIC;
                 camera.projection = CAMERA_ORTHOGRAPHIC;
@@ -51,7 +54,7 @@ int main(void)
                 camera.fovy = FOVY_PERSPECTIVE;
                 camera.projection = CAMERA_PERSPECTIVE;
             }
-        }
+        }*/
          
         if (IsKeyPressed(KEY_Q))
         {
@@ -69,7 +72,7 @@ int main(void)
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            ray = GetMouseRay(GetMousePosition(), camera);
+            ray = GetMouseRay(GetMousePosition(), camera.camera);
 
             // Check collision between ray and box
             collisionBox = GetRayCollisionBox(ray,
@@ -95,10 +98,10 @@ int main(void)
 
         ClearBackground(RAYWHITE);
 
-        if (camera.projection == CAMERA_ORTHOGRAPHIC) DrawText("ORTHOGRAPHIC", 10, 40, 20, BLACK);
-        else if (camera.projection == CAMERA_PERSPECTIVE) DrawText("PERSPECTIVE", 10, 40, 20, BLACK);
+        //if (camera.projection == CAMERA_ORTHOGRAPHIC) DrawText("ORTHOGRAPHIC", 10, 40, 20, BLACK);
+        //else if (camera.projection == CAMERA_PERSPECTIVE) DrawText("PERSPECTIVE", 10, 40, 20, BLACK);
 
-        BeginMode3D(camera);
+        BeginMode3D(camera.camera);
             /*DrawLine3D(Vector3{ 0.f, 0.f, 0.f }, Vector3{1.f, 0.f, 0.f}, DARKBLUE);*/
             map.Draw();
             if (collisionBox.hit)
