@@ -85,7 +85,7 @@ int main(void)
             
         }
 
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
             ray = GetMouseRay(GetMousePosition(), camera.camera);
 

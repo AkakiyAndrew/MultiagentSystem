@@ -55,7 +55,6 @@ Map::Map()
 
     //textureTerraformPlot - texture for highlighting
     //Color* colorPixels = new Color[width * length];
-
     //int index;
     //for (int z = 0; z < length; z++)
     //{
@@ -83,7 +82,6 @@ Map::Map()
     //    1,
     //    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
     //};
-
     //textureTerraformPlot.texture = LoadTextureFromImage(colorImage);
     //delete[] colorPixels;
 
@@ -211,7 +209,14 @@ Vector2 Map::getMapSize()
 
 void Map::plotTerraform(Ray ray, int radius, bool state)
 {
-    RayCollision collisionMesh = GetRayCollisionMesh(ray, mesh, model.transform);
+    //RayCollision collisionMesh = GetRayCollisionMesh(ray, mesh, model.transform);
+    RayCollision collisionMesh = GetRayCollisionQuad(ray,
+        position, //left-up
+        { position.x, position.y, length * sizeMultiplier }, //left-down
+        { width * sizeMultiplier, position.y, length * sizeMultiplier }, //right-down
+        { width * sizeMultiplier, position.y, position.z }); //right-up 
+        
+    
     if (collisionMesh.hit)
     {
         int centerX = (collisionMesh.point.x * width) / (sizeMultiplier * width - position.x);
@@ -221,22 +226,37 @@ void Map::plotTerraform(Ray ray, int radius, bool state)
         Vector2 downRightCorner = { std::clamp<float>(centerX + radius, centerX, length - 1), std::clamp<float>(centerZ + radius, centerZ, this->length - 1) };
         //reducing up limit `cause of max index of maps (not the actual indices)
 
+        BeginTextureMode(textureTerraformPlot);
+
         for (int z = upLeftCorner.y; z <= downRightCorner.y; z++)
         {
             for (int x = upLeftCorner.x; x <= downRightCorner.x; x++)
             {
                 if (CheckCollisionPointCircle(Vector2{ static_cast<float>(x), static_cast<float>(z) }, Vector2{ static_cast<float>(centerX), static_cast<float>(centerZ) }, radius))
+                {
                     terraformPlanMap[z][x] = state;
+                    if (state)
+                    {
+                        if(heightMap[z][x] == zeroLayerLevel)
+                            DrawPixel(x, length - z, GREEN);
+                        else
+                            DrawPixel(x, length - z, BLUE);
+                    }
+                    else
+                        DrawPixel(x, length - z, RED);
+                    
+                }
             }
         }
 
-        BeginTextureMode(textureTerraformPlot);
+        EndTextureMode();
+
+        /*BeginTextureMode(textureTerraformPlot);
             if (state == true)
                 DrawCircle(centerX, length - centerZ, radius, BLUE);
             else
                 DrawCircle(centerX, length - centerZ, radius, RED);
-        EndTextureMode();
-        
+        EndTextureMode();*/
     }
 }
 
