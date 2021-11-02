@@ -28,13 +28,11 @@ void CustomCamera::Update()
 	}
 	if (mousePosition.y > screenSize.y * 0.9f)
 	{
-		camera.target.y = camera.position.y + (camera.target.x - camera.position.x) * cos(TURN_DEG) - (camera.target.x - camera.position.x) * sinf(TURN_DEG);
-		//camera.target.y -= TURN_DEG * 20.0f;
+		camera.target.y -= TURN_DEG * 20.0f;
 	}
 	if (mousePosition.y < screenSize.y * 0.1f)
 	{
-		camera.target.y = camera.position.y + (camera.target.x - camera.position.x) * cos(-TURN_DEG) - (camera.target.x - camera.position.x) * sinf(-TURN_DEG);
-		//camera.target.y += TURN_DEG * 20.0f;
+		camera.target.y += TURN_DEG * 20.0f;
 	}
 	// Vector3Scale -> Vector3Scale
 	if (IsKeyDown(KEY_W)) 
