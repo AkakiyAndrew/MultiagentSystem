@@ -4,8 +4,8 @@
 #include "include/raymath.h"
 #include <math.h>
 
-#define TURN_DEG 1 * DEG2RAD
-#define PLAYER_SPEED 10.0f
+#define TURN_DEG 3 * DEG2RAD
+#define PLAYER_SPEED 30.0f
 
 class CustomCamera 
 {

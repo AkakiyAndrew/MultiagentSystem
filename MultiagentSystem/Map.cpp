@@ -8,12 +8,12 @@ Map::Map()
 
     length = image.height;
     width = image.width;
-    maxHeight = 1;
+    maxHeight = 64;
     sizeMultiplier = 1.f;
 
     textureTerraformPlot = LoadRenderTexture(width, length);
     BeginTextureMode(textureTerraformPlot);
-    ClearBackground(RED);
+        ClearBackground(RED);
     EndTextureMode();
 
     texture = LoadTextureFromImage(image);                
@@ -24,10 +24,10 @@ Map::Map()
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture; // Set map diffuse texture
     
     //memory allocation
-    heightMap = new unsigned short* [length];
+    heightMap = new short* [length];
     for (int i = 0; i < length; i++)
     {
-        heightMap[i] = new unsigned short[width];
+        heightMap[i] = new short[width];
     }
     terraformPlanMap = new bool* [length];
     for (int i = 0; i < length; i++)
@@ -37,13 +37,13 @@ Map::Map()
 
     //heightMap
     int offset = 0;
-    unsigned char* pixels = (unsigned char*)image.data;
+    Color *pixels = LoadImageColors(image);
     for (int z = 0; z < length; z++)
     {
         for (int x = 0; x < width; x++)
         {
-            heightMap[z][x] = (pixels[offset] + pixels[offset + 1] + pixels[offset + 2]) / 3;
-            offset += 4;
+            heightMap[z][x] = (pixels[offset].r + pixels[offset].g + pixels[offset].b) / 3;
+            offset += 1;
         }   
     }
 
@@ -74,7 +74,6 @@ Map::Map()
     //        }
     //    }
     //}
-
     //Image colorImage = {
     //    colorPixels,
     //    width,
@@ -214,7 +213,8 @@ void Map::plotTerraform(Ray ray, int radius, bool state)
         position, //left-up
         { position.x, position.y, length * sizeMultiplier }, //left-down
         { width * sizeMultiplier, position.y, length * sizeMultiplier }, //right-down
-        { width * sizeMultiplier, position.y, position.z }); //right-up 
+        { width * sizeMultiplier, position.y, position.z } //right-up 
+    ); 
         
     
     if (collisionMesh.hit)
@@ -223,7 +223,7 @@ void Map::plotTerraform(Ray ray, int radius, bool state)
         int centerZ = (collisionMesh.point.z * length) / (sizeMultiplier * length - position.z);
 
         Vector2 upLeftCorner = { std::clamp<float>(centerX - radius, 0, centerX), std::clamp<float>(centerZ - radius, 0, centerZ) };
-        Vector2 downRightCorner = { std::clamp<float>(centerX + radius, centerX, length - 1), std::clamp<float>(centerZ + radius, centerZ, this->length - 1) };
+        Vector2 downRightCorner = { std::clamp<float>(centerX + radius, centerX, width - 1), std::clamp<float>(centerZ + radius, centerZ, this->length - 1) };
         //reducing up limit `cause of max index of maps (not the actual indices)
 
         BeginTextureMode(textureTerraformPlot);
@@ -237,10 +237,10 @@ void Map::plotTerraform(Ray ray, int radius, bool state)
                     terraformPlanMap[z][x] = state;
                     if (state)
                     {
-                        if(heightMap[z][x] == zeroLayerLevel)
-                            DrawPixel(x, length - z, GREEN);
+                        if (heightMap[z][x] == zeroLayerLevel)
+                            DrawPixel(x, length - z - 1, GREEN);
                         else
-                            DrawPixel(x, length - z, BLUE);
+                            DrawPixel(x, length - z - 1, BLUE);
                     }
                     else
                         DrawPixel(x, length - z, RED);

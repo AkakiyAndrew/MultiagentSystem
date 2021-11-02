@@ -16,10 +16,10 @@ class Map
 	Model model;
 	Vector3 position;
 
-	unsigned short** heightMap = nullptr;
+	short** heightMap = nullptr;
 	bool** terraformPlanMap = nullptr;
 	bool terraformPlanDraw = false;
-	unsigned short zeroLayerLevel = 125;
+	short zeroLayerLevel = 125;
 
 public:
 	RenderTexture2D textureTerraformPlot;
