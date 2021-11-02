@@ -9,6 +9,7 @@ class Map
 	int maxHeight;
 	float sizeMultiplier;
 
+	RenderTexture2D textureTerraformPlan;
 	Texture2D texture;
 	//Texture2D textureTerraformPlot;
 	
@@ -22,17 +23,16 @@ class Map
 	short zeroLayerLevel = 125;
 
 public:
-	RenderTexture2D textureTerraformPlot;
 	Map();
 	//sets height in specified position
 	void setHeight(int x, int z, short height);
 	//set terraform plan to desired state
-	void plotTerraform(Ray ray, int radius, bool state);
-	void renderTerraformPlot();
+	void planTerraform(Ray ray, int radius, bool state);
 
 	unsigned short getHeight(int x, int z);
-	bool getTerraformPlotState(int x, int z);
+	bool getTerraformPlanState(int x, int z);
 	Vector2 getMapSize();
+	Texture getMinimapTexture();
 
 	void switchTerraformDraw();
 	void Draw();

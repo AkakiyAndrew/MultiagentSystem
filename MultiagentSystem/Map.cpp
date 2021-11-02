@@ -11,8 +11,8 @@ Map::Map()
     maxHeight = 64;
     sizeMultiplier = 1.f;
 
-    textureTerraformPlot = LoadRenderTexture(width, length);
-    BeginTextureMode(textureTerraformPlot);
+    textureTerraformPlan = LoadRenderTexture(width, length);
+    BeginTextureMode(textureTerraformPlan);
         ClearBackground(RED);
     EndTextureMode();
 
@@ -110,20 +110,6 @@ void Map::Draw()
     DrawModelWires(model, position, 1, DARKGRAY);
 
     //DrawGrid(20, 1.0f);
-
-    //terraform cubes planning highlighting
-    /*Vector3 cubePosition;
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            cubePosition = { position.x + j*3.f, heightMap[i][j]/255.f + 1.f, position.z + i*3.f };
-            if (terraformPlanMap[i][j])
-                DrawCube(cubePosition, 1, 1, 1, GREEN);
-            else
-                DrawCube(cubePosition, 1, 1, 1, RED);
-        }
-    } */
 }
 
 void Map::setHeight(int x, int z, short height)
@@ -136,6 +122,18 @@ void Map::setHeight(int x, int z, short height)
     if (x >= 0 && x <= xMax && z >= 0 && z <= zMax)
     {
         heightMap[z][x] = height;
+
+        BeginTextureMode(textureTerraformPlan);
+        if (terraformPlanMap[z][x] == true)
+        {
+            if (height == zeroLayerLevel)
+                DrawPixel(x, length - z - 1, GREEN);
+            else
+                DrawPixel(x, length - z - 1, BLUE);
+        }
+        else
+            DrawPixel(x, length - z, RED);
+        EndTextureMode();
 
         int vCounter = 0;
 
@@ -187,11 +185,11 @@ void Map::switchTerraformDraw()
     else
     {
         terraformPlanDraw = true;
-        model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = textureTerraformPlot.texture;
+        model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = textureTerraformPlan.texture;
     }
 }
 
-bool Map::getTerraformPlotState(int x, int z)
+bool Map::getTerraformPlanState(int x, int z)
 {
     return terraformPlanMap[z][x];
 }
@@ -206,9 +204,16 @@ Vector2 Map::getMapSize()
     return Vector2{ static_cast<float>(width), static_cast<float>(length) };
 }
 
-void Map::plotTerraform(Ray ray, int radius, bool state)
+Texture Map::getMinimapTexture()
 {
-    //RayCollision collisionMesh = GetRayCollisionMesh(ray, mesh, model.transform);
+    if (terraformPlanDraw)
+        return textureTerraformPlan.texture;
+    else
+        return texture;
+}
+
+void Map::planTerraform(Ray ray, int radius, bool state)
+{
     RayCollision collisionMesh = GetRayCollisionQuad(ray,
         position, //left-up
         { position.x, position.y, length * sizeMultiplier }, //left-down
@@ -226,7 +231,7 @@ void Map::plotTerraform(Ray ray, int radius, bool state)
         Vector2 downRightCorner = { std::clamp<float>(centerX + radius, centerX, width - 1), std::clamp<float>(centerZ + radius, centerZ, this->length - 1) };
         //reducing up limit `cause of max index of maps (not the actual indices)
 
-        BeginTextureMode(textureTerraformPlot);
+        BeginTextureMode(textureTerraformPlan);
 
         for (int z = upLeftCorner.y; z <= downRightCorner.y; z++)
         {
@@ -250,17 +255,5 @@ void Map::plotTerraform(Ray ray, int radius, bool state)
         }
 
         EndTextureMode();
-
-        /*BeginTextureMode(textureTerraformPlot);
-            if (state == true)
-                DrawCircle(centerX, length - centerZ, radius, BLUE);
-            else
-                DrawCircle(centerX, length - centerZ, radius, RED);
-        EndTextureMode();*/
     }
-}
-
-void Map::renderTerraformPlot()
-{
-    
 }

@@ -103,7 +103,7 @@ int main(void)
                 collisionBox.hit = false;
 
                 // if box isnt hitted - check collision with mesh
-                map.plotTerraform(ray, radius, true);
+                map.planTerraform(ray, radius, true);
                 //map.renderTerraformPlot();
             }
         }
@@ -137,9 +137,11 @@ int main(void)
 
         EndMode3D();
 
-        DrawTextureRec(map.textureTerraformPlot.texture, Rectangle { 0, 0, (float)map.textureTerraformPlot.texture.width, (float)-map.textureTerraformPlot.texture.height }, Vector2 { 0, 0 }, WHITE);
-
         //minimap
+        Texture minimap = map.getMinimapTexture();
+        DrawTextureRec(minimap, Rectangle { 0, 0, (float)minimap.width, (float)-minimap.height }, Vector2 { 0, 0 }, WHITE);
+
+        
         /*DrawTexture(texture, screenWidth - width - 20, 20, WHITE);
         DrawRectangleLines(screenWidth - width - 20, 20, width, height, GREEN);*/
 
