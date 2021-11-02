@@ -31,6 +31,7 @@ int main(void)
 
     RayCollision collisionBox = { 0 };
     RayCollision collisionMesh = { 0 };
+    int radius = 2;
 
     SetTargetFPS(60);                       // Set our game to run at 60 frames-per-second
 
@@ -70,6 +71,20 @@ int main(void)
             map.switchTerraformDraw();
         }
 
+        if (IsKeyPressed(KEY_KP_ADD))
+        {
+            radius++;
+        }
+        if (IsKeyPressed(KEY_KP_SUBTRACT))
+        {
+            radius--;
+        }
+
+        if (IsKeyPressed(KEY_X))
+        {
+            
+        }
+
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             ray = GetMouseRay(GetMousePosition(), camera.camera);
@@ -86,9 +101,8 @@ int main(void)
                 collisionBox.hit = false;
 
                 // if box isnt hitted - check collision with mesh
-                map.plotTerraform(ray, 1, true);
-                map.renderTerraformPlot();
-
+                map.plotTerraform(ray, radius, true);
+                //map.renderTerraformPlot();
             }
         }
 
@@ -97,7 +111,7 @@ int main(void)
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
-
+        
         //if (camera.projection == CAMERA_ORTHOGRAPHIC) DrawText("ORTHOGRAPHIC", 10, 40, 20, BLACK);
         //else if (camera.projection == CAMERA_PERSPECTIVE) DrawText("PERSPECTIVE", 10, 40, 20, BLACK);
 
@@ -120,6 +134,8 @@ int main(void)
             DrawRay(ray, MAROON);
 
         EndMode3D();
+
+        DrawTextureRec(map.textureTerraformPlot.texture, Rectangle { 0, 0, (float)map.textureTerraformPlot.texture.width, (float)-map.textureTerraformPlot.texture.height }, Vector2 { 0, 0 }, WHITE);
 
         //minimap
         /*DrawTexture(texture, screenWidth - width - 20, 20, WHITE);

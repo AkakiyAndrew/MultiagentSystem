@@ -4,12 +4,17 @@
 
 Map::Map()
 {
-    Image image = LoadImage("heightmap_0.png");
+    Image image = LoadImage("heightmap.png");
 
     length = image.height;
     width = image.width;
     maxHeight = 1;
     sizeMultiplier = 1.f;
+
+    textureTerraformPlot = LoadRenderTexture(width, length);
+    BeginTextureMode(textureTerraformPlot);
+    ClearBackground(RED);
+    EndTextureMode();
 
     texture = LoadTextureFromImage(image);                
     mesh = GenMeshHeightmap(image, Vector3{ sizeMultiplier*width, maxHeight*sizeMultiplier, sizeMultiplier*length });    // Generate heightmap mesh (RAM and VRAM)
@@ -47,7 +52,40 @@ Map::Map()
         for (int j = 0; j < width; j++)
             terraformPlanMap[i][j] = false;
 
-    renderTerraformPlot();
+
+    //textureTerraformPlot - texture for highlighting
+    //Color* colorPixels = new Color[width * length];
+
+    //int index;
+    //for (int z = 0; z < length; z++)
+    //{
+    //    for (int x = 0; x < width; x++)
+    //    {
+    //        index = z * width + x;
+    //        if (terraformPlanMap[z][x] == true)
+    //        {
+    //            /*if (heightMap[z][x] == zeroLayerLevel)
+    //                colorPixels[index] = GREEN;
+    //            else*/
+    //            colorPixels[index] = BLUE;
+    //        }
+    //        else
+    //        {
+    //            colorPixels[index] = RED;
+    //        }
+    //    }
+    //}
+
+    //Image colorImage = {
+    //    colorPixels,
+    //    width,
+    //    length,
+    //    1,
+    //    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
+    //};
+
+    //textureTerraformPlot.texture = LoadTextureFromImage(colorImage);
+    //delete[] colorPixels;
 
     UnloadImage(image);
 }
@@ -152,7 +190,7 @@ void Map::switchTerraformDraw()
     else
     {
         terraformPlanDraw = true;
-        model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = textureTerraformPlot;
+        model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = textureTerraformPlot.texture;
     }
 }
 
@@ -189,45 +227,20 @@ void Map::plotTerraform(Ray ray, int radius, bool state)
             {
                 if (CheckCollisionPointCircle(Vector2{ static_cast<float>(x), static_cast<float>(z) }, Vector2{ static_cast<float>(centerX), static_cast<float>(centerZ) }, radius))
                     terraformPlanMap[z][x] = state;
-                //TODO: optimize this crap (and make parallel computaton?)
             }
         }
+
+        BeginTextureMode(textureTerraformPlot);
+            if (state == true)
+                DrawCircle(centerX, length - centerZ, radius, BLUE);
+            else
+                DrawCircle(centerX, length - centerZ, radius, RED);
+        EndTextureMode();
+        
     }
 }
 
 void Map::renderTerraformPlot()
 {
-    Color* colorPixels = new Color[width * length];
     
-    int index;
-    for (int z = 0; z < length; z++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            index = z * width + x;
-            if (terraformPlanMap[z][x] == true)
-            {
-                if(heightMap[z][x] == zeroLayerLevel)
-                    colorPixels[index] = GREEN;
-                else
-                    colorPixels[index] = BLUE;
-            }
-            else
-            {
-                colorPixels[index] = RED;
-            }
-        }
-    }
-
-    Image colorImage = {
-        colorPixels,
-        width,
-        length,
-        1,
-        PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
-    };
-
-    UnloadTexture(textureTerraformPlot);
-    textureTerraformPlot = LoadTextureFromImage(colorImage);
-    delete[] colorPixels;
 }

@@ -10,7 +10,8 @@ class Map
 	float sizeMultiplier;
 
 	Texture2D texture;
-	Texture2D textureTerraformPlot;
+	//Texture2D textureTerraformPlot;
+	
 	Mesh mesh;
 	Model model;
 	Vector3 position;
@@ -21,6 +22,7 @@ class Map
 	unsigned short zeroLayerLevel = 125;
 
 public:
+	RenderTexture2D textureTerraformPlot;
 	Map();
 	//sets height in specified position
 	void setHeight(int x, int z, short height);
