@@ -4,8 +4,10 @@
 
 class Map
 {
-	int height;
+	int length;
 	int width;
+	int maxHeight;
+	float sizeMultiplier;
 
 	Texture2D texture;
 	Texture2D textureTerraformPlot;
@@ -23,11 +25,12 @@ public:
 	//sets height in specified position
 	void setHeight(int x, int z, short height);
 	//set terraform plan to desired state
-	void plotTerraform(int x, int z, int radius, bool state);
+	void plotTerraform(Ray ray, int radius, bool state);
 	void renderTerraformPlot();
 
 	unsigned short getHeight(int x, int z);
 	bool getTerraformPlotState(int x, int z);
+	Vector2 getMapSize();
 
 	void switchTerraformDraw();
 	void Draw();

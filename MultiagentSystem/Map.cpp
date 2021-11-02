@@ -4,27 +4,28 @@
 
 Map::Map()
 {
-    Image image = LoadImage("heightmap.png");
+    Image image = LoadImage("heightmap_0.png");
 
-    height = image.height;
+    length = image.height;
     width = image.width;
-    texture = LoadTextureFromImage(image);                // Convert image to texture (VRAM)
-    float sizeMultiplier = 1.f;
-    mesh = GenMeshHeightmap(image, Vector3{ sizeMultiplier, 1, sizeMultiplier });    // Generate heightmap mesh (RAM and VRAM)
+    maxHeight = 1;
+    sizeMultiplier = 1.f;
+
+    texture = LoadTextureFromImage(image);                
+    mesh = GenMeshHeightmap(image, Vector3{ sizeMultiplier*width, maxHeight*sizeMultiplier, sizeMultiplier*length });    // Generate heightmap mesh (RAM and VRAM)
     position = Vector3{ 0.f, 0.0f, 0.f};
 
-    model = LoadModelFromMesh(mesh);                          // Load model from generated mesh
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;         // Set map diffuse texture
+    model = LoadModelFromMesh(mesh); 
+    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture; // Set map diffuse texture
     
     //memory allocation
-    heightMap = new unsigned short* [height];
-    for (int i = 0; i < height; i++)
+    heightMap = new unsigned short* [length];
+    for (int i = 0; i < length; i++)
     {
         heightMap[i] = new unsigned short[width];
     }
-
-    terraformPlanMap = new bool* [height];
-    for (int i = 0; i < height; i++)
+    terraformPlanMap = new bool* [length];
+    for (int i = 0; i < length; i++)
     {
         terraformPlanMap[i] = new bool[width];
     }
@@ -32,7 +33,7 @@ Map::Map()
     //heightMap
     int offset = 0;
     unsigned char* pixels = (unsigned char*)image.data;
-    for (int z = 0; z < height; z++)
+    for (int z = 0; z < length; z++)
     {
         for (int x = 0; x < width; x++)
         {
@@ -40,8 +41,9 @@ Map::Map()
             offset += 4;
         }   
     }
+
     //set terraform planing default values
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < length; i++)
         for (int j = 0; j < width; j++)
             terraformPlanMap[i][j] = false;
 
@@ -52,13 +54,13 @@ Map::Map()
 
 Map::~Map()
 {
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < length; i++)
     {
         delete[] heightMap[i];
     }
     delete[] heightMap;
 
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < length; i++)
     {
         delete[] terraformPlanMap[i];
     }
@@ -72,7 +74,7 @@ void Map::Draw()
     DrawModel(model, position, 1.0f, GRAY);
     DrawModelWires(model, position, 1, DARKGRAY);
 
-    DrawGrid(20, 1.0f);
+    //DrawGrid(20, 1.0f);
 
     //terraform cubes planning highlighting
     /*Vector3 cubePosition;
@@ -92,7 +94,10 @@ void Map::Draw()
 void Map::setHeight(int x, int z, short height)
 {
     int xMax = width - 1;
-    int zMax = height - 1;
+    int zMax = length - 1;
+
+    float actualHeight = height * (maxHeight * sizeMultiplier / 255.f);
+
     if (x >= 0 && x <= xMax && z >= 0 && z <= zMax)
     {
         heightMap[z][x] = height;
@@ -103,30 +108,30 @@ void Map::setHeight(int x, int z, short height)
         vCounter = ((z - 1) * xMax + x - 1) * 18;
         if (vCounter >= 0 && x > 0 && z > 0)
         {
-            mesh.vertices[vCounter + 16] = static_cast<float>(height);
+            mesh.vertices[vCounter + 16] = actualHeight;
         }
 
         //right-up
         vCounter = ((z - 1) * xMax + x) * 18;
         if (vCounter >= 0 && x < xMax && z > 0)
         {
-            mesh.vertices[vCounter + 4] = static_cast<float>(height);
-            mesh.vertices[vCounter + 13] = static_cast<float>(height);
+            mesh.vertices[vCounter + 4] = actualHeight;
+            mesh.vertices[vCounter + 13] = actualHeight;
         }
 
         //left-down
         vCounter = (z * xMax + x - 1) * 18;
         if (vCounter >= 0 && x > 0 && z < zMax)
         {
-            mesh.vertices[vCounter + 7] = static_cast<float>(height);
-            mesh.vertices[vCounter + 10] = static_cast<float>(height);
+            mesh.vertices[vCounter + 7] = actualHeight;
+            mesh.vertices[vCounter + 10] = actualHeight;
         }
 
         //right-down
         vCounter = (z * xMax + x) * 18;
         if (vCounter >= 0 && x < xMax && z < zMax )
         {
-            mesh.vertices[vCounter + 1] = static_cast<float>(height);
+            mesh.vertices[vCounter + 1] = actualHeight;
         }
 
         UpdateMeshBuffer(mesh, 0, mesh.vertices, sizeof(float) * mesh.vertexCount * 3, 0);
@@ -161,29 +166,41 @@ unsigned short Map::getHeight(int x, int z)
     return heightMap[z][x];
 }
 
-void Map::plotTerraform(int centerX, int centerZ, int radius, bool state)
+Vector2 Map::getMapSize()
 {
-    Vector2 upLeftCorner = { std::clamp<float>(centerX - radius, 0, centerX), std::clamp<float>(centerZ - radius, 0, centerZ) };
-    Vector2 downRightCorner = { std::clamp<float>(centerX + radius, centerX, height - 1), std::clamp<float>(centerZ + radius, centerZ, this->height - 1) };
-    //reducing up limit `cause of max index of maps (not the actual indices)
+    return Vector2{ static_cast<float>(width), static_cast<float>(length) };
+}
 
-    for (int z = upLeftCorner.y; z <= downRightCorner.y; z++)
+void Map::plotTerraform(Ray ray, int radius, bool state)
+{
+    RayCollision collisionMesh = GetRayCollisionMesh(ray, mesh, model.transform);
+    if (collisionMesh.hit)
     {
-        for (int x = upLeftCorner.x; x <= downRightCorner.x; x++)
+        int centerX = (collisionMesh.point.x * width) / (sizeMultiplier * width - position.x);
+        int centerZ = (collisionMesh.point.z * length) / (sizeMultiplier * length - position.z);
+
+        Vector2 upLeftCorner = { std::clamp<float>(centerX - radius, 0, centerX), std::clamp<float>(centerZ - radius, 0, centerZ) };
+        Vector2 downRightCorner = { std::clamp<float>(centerX + radius, centerX, length - 1), std::clamp<float>(centerZ + radius, centerZ, this->length - 1) };
+        //reducing up limit `cause of max index of maps (not the actual indices)
+
+        for (int z = upLeftCorner.y; z <= downRightCorner.y; z++)
         {
-            if (CheckCollisionPointCircle(Vector2{ static_cast<float>(x), static_cast<float>(z) }, Vector2{ static_cast<float>(centerX), static_cast<float>(centerZ) }, radius))
-                terraformPlanMap[z][x] = state;
-            //TODO: optimize this crap (and make parallel computaton?)
+            for (int x = upLeftCorner.x; x <= downRightCorner.x; x++)
+            {
+                if (CheckCollisionPointCircle(Vector2{ static_cast<float>(x), static_cast<float>(z) }, Vector2{ static_cast<float>(centerX), static_cast<float>(centerZ) }, radius))
+                    terraformPlanMap[z][x] = state;
+                //TODO: optimize this crap (and make parallel computaton?)
+            }
         }
     }
 }
 
 void Map::renderTerraformPlot()
 {
-    Color* colorPixels = new Color[width * height];
+    Color* colorPixels = new Color[width * length];
     
     int index;
-    for (int z = 0; z < height; z++)
+    for (int z = 0; z < length; z++)
     {
         for (int x = 0; x < width; x++)
         {
@@ -205,7 +222,7 @@ void Map::renderTerraformPlot()
     Image colorImage = {
         colorPixels,
         width,
-        height,
+        length,
         1,
         PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
     };
