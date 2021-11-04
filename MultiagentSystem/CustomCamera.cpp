@@ -9,14 +9,16 @@ CustomCamera::CustomCamera(Vector3 position, Vector3 target, Vector3 up, float f
 	camera.target = target;
 	camera.up = up;
 	camera.projection = CAMERA_PERSPECTIVE;
-	SetCameraMode(camera, CAMERA_FREE);
+	SetCameraMode(camera, CAMERA_THIRD_PERSON);
 }
 
 void CustomCamera::Update() 
 {
+	UpdateCamera(&camera);
+
 	Vector2 mousePosition = GetMousePosition();
 
-	if (mousePosition.x > screenSize.x * 0.9f)
+	/*if (mousePosition.x > screenSize.x * 0.9f)
 	{
 		camera.target.x = camera.position.x + (camera.target.x - camera.position.x) * cos(TURN_DEG) - (camera.target.z - camera.position.z) * sinf(TURN_DEG);
 		camera.target.z = camera.position.z + (camera.target.z - camera.position.z) * cos(TURN_DEG) + (camera.target.x - camera.position.x) * sinf(TURN_DEG);
@@ -33,20 +35,11 @@ void CustomCamera::Update()
 	if (mousePosition.y < screenSize.y * 0.1f)
 	{
 		camera.target.y += TURN_DEG * 20.0f;
-	}
-	// Vector3Scale -> Vector3Scale
+	}*/
+
 	if (IsKeyDown(KEY_W)) 
 	{
-		camera.position = 
-			Vector3Add(camera.position, 
-				Vector3Scale(
-					Vector3Normalize(
-						Vector3Negate(
-							Vector3Subtract(camera.position, camera.target)
-						)
-					), PLAYER_SPEED * GetFrameTime()
-				)
-			);
+		camera.position = Vector3Add(camera.position, Vector3Scale(Vector3Normalize(Vector3Negate(Vector3Subtract(camera.position, camera.target))), PLAYER_SPEED * GetFrameTime()));
 		camera.target = Vector3Add(camera.target, Vector3Scale(Vector3Normalize(Vector3Negate(Vector3Subtract(camera.position, camera.target))), PLAYER_SPEED * GetFrameTime()));
 	}
 	if (IsKeyDown(KEY_S)) 

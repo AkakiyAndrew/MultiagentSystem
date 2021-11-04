@@ -36,9 +36,10 @@ int main(void)
 
     Map map = Map(shader);
 
-    Model diggerModel = LoadModel("Digger.vox");
+    Model diggerModel = LoadModel("output.obj");
+    
     diggerModel.materials[0].shader = shader;
-    diggerModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, BLUE));
+    //diggerModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, BLUE));
     Digger digger = Digger(Vector3{ 0.f,0.f,0.f }, &map, diggerModel);
 
     Vector3 cubePosition = { 0.0f, 1.0f, 0.0f };
