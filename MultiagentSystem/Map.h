@@ -1,6 +1,7 @@
 #pragma once
 #include "include/raylib.h"
 #include <algorithm>
+#include "Enums.h"
 
 class Map
 {
@@ -23,16 +24,18 @@ class Map
 	short zeroLayerLevel = 125;
 
 public:
-	Map();
+	Map(Shader shader);
 	//sets height in specified position
 	void setHeight(int x, int z, short height);
 	//set terraform plan to desired state
 	void planTerraform(Ray ray, int radius, bool state);
 
-	unsigned short getHeight(int x, int z);
+	short getHeight(int x, int z);
+	float getActualHeight(int x, int z);
 	bool getTerraformPlanState(int x, int z);
 	Vector2 getMapSize();
 	Texture getMinimapTexture();
+	TileIndex getTileIndexFromVector(Vector3 position);
 
 	void switchTerraformDraw();
 	void Draw();

@@ -2,7 +2,7 @@
 
 #define GRAY_VALUE(c) ((c.r+c.g+c.b)/3)
 
-Map::Map()
+Map::Map(Shader shader)
 {
     Image image = LoadImage("heightmap.png");
 
@@ -20,7 +20,8 @@ Map::Map()
     mesh = GenMeshHeightmap(image, Vector3{ sizeMultiplier*width, maxHeight*sizeMultiplier, sizeMultiplier*length });    // Generate heightmap mesh (RAM and VRAM)
     position = Vector3{ 0.f, 0.0f, 0.f};
 
-    model = LoadModelFromMesh(mesh); 
+    model = LoadModelFromMesh(mesh);
+    model.materials[0].shader = shader;
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture; // Set map diffuse texture
     
     //memory allocation
@@ -102,6 +103,7 @@ Map::~Map()
     delete[] terraformPlanMap;
 
     UnloadTexture(texture);
+    UnloadRenderTexture(textureTerraformPlan);
 }
 
 void Map::Draw()
@@ -194,9 +196,14 @@ bool Map::getTerraformPlanState(int x, int z)
     return terraformPlanMap[z][x];
 }
 
-unsigned short Map::getHeight(int x, int z)
+short Map::getHeight(int x, int z)
 {
     return heightMap[z][x];
+}
+
+float Map::getActualHeight(int x, int z)
+{
+    return heightMap[z][x] * (maxHeight * sizeMultiplier / 255.f);
 }
 
 Vector2 Map::getMapSize()
@@ -210,6 +217,14 @@ Texture Map::getMinimapTexture()
         return textureTerraformPlan.texture;
     else
         return texture;
+}
+
+TileIndex Map::getTileIndexFromVector(Vector3 position)
+{
+    return TileIndex(
+        static_cast<int>((position.x * width) / (sizeMultiplier * width - position.x)),
+        static_cast<int>((position.z * length) / (sizeMultiplier * length - position.z))
+    );
 }
 
 void Map::planTerraform(Ray ray, int radius, bool state)

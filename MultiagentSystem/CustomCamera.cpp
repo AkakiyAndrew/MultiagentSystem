@@ -63,7 +63,17 @@ void CustomCamera::Update()
 	{
 		camera.position = Vector3Add(camera.position, Vector3Scale(Vector3Normalize(Vector3CrossProduct(Vector3Normalize(Vector3Subtract(camera.target, camera.position)), camera.up)), PLAYER_SPEED * GetFrameTime()));
 		camera.target = Vector3Add(camera.target, Vector3Scale(Vector3Normalize(Vector3CrossProduct(Vector3Normalize(Vector3Subtract(camera.target, camera.position)), camera.up)), PLAYER_SPEED * GetFrameTime()));
-	};
+	}
+	if (IsKeyDown(KEY_Q))
+	{
+		camera.target.y -= TURN_DEG * 20.0f;
+		camera.position.y -= TURN_DEG * 20.0f;
+	}
+	if (IsKeyDown(KEY_E))
+	{
+		camera.target.y += TURN_DEG * 20.0f;
+		camera.position.y += TURN_DEG * 20.0f;
+	}
 };
 
 //void CustomCamera::Render()
