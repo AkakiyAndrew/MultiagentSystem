@@ -6,7 +6,7 @@ Map::Map(Shader shader)
 
     length = image.height;
     width = image.width;
-    maxHeight = 1;
+    maxHeight = 16;
     sizeMultiplier = 1.f;
 
     textureTerraformPlan = LoadRenderTexture(width, length);

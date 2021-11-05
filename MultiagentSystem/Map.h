@@ -7,16 +7,14 @@ class Map
 {
 	int length;
 	int width;
-	int maxHeight;
-	float sizeMultiplier;
-
+	
 	RenderTexture2D textureTerraformPlan;
 	Texture2D texture;
-	//Texture2D textureTerraformPlot;
-	
 	Mesh mesh;
 	Model model;
 	Vector3 position;
+	int maxHeight; //only visual - dont affect heightMap
+	float sizeMultiplier; //how quads are big 
 
 	short** heightMap = nullptr;
 	bool** terraformPlanMap = nullptr;

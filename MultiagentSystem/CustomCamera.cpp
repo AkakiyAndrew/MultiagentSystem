@@ -30,12 +30,12 @@ void CustomCamera::Update()
 	}
 	if (IsKeyDown(KEY_A)) 
 	{
-		//camera.position = Vector3Subtract(camera.position, Vector3Scale(Vector3Normalize(Vector3CrossProduct(Vector3Normalize(Vector3Subtract(camera.target, camera.position)), camera.up)), PLAYER_SPEED * GetFrameTime()));
+		camera.position = Vector3Subtract(camera.position, Vector3Scale(Vector3Normalize(Vector3CrossProduct(Vector3Normalize(Vector3Subtract(camera.target, camera.position)), camera.up)), PLAYER_SPEED * GetFrameTime()));
 		camera.target = Vector3Subtract(camera.target, Vector3Scale(Vector3Normalize(Vector3CrossProduct(Vector3Normalize(Vector3Subtract(camera.target, camera.position)), camera.up)), PLAYER_SPEED * GetFrameTime()));
 	}
 	if (IsKeyDown(KEY_D)) 
 	{
-		//camera.position = Vector3Add(camera.position, Vector3Scale(Vector3Normalize(Vector3CrossProduct(Vector3Normalize(Vector3Subtract(camera.target, camera.position)), camera.up)), PLAYER_SPEED * GetFrameTime()));
+		camera.position = Vector3Add(camera.position, Vector3Scale(Vector3Normalize(Vector3CrossProduct(Vector3Normalize(Vector3Subtract(camera.target, camera.position)), camera.up)), PLAYER_SPEED * GetFrameTime()));
 		camera.target = Vector3Add(camera.target, Vector3Scale(Vector3Normalize(Vector3CrossProduct(Vector3Normalize(Vector3Subtract(camera.target, camera.position)), camera.up)), PLAYER_SPEED * GetFrameTime()));
 	}
 	if (IsKeyDown(KEY_Q))
