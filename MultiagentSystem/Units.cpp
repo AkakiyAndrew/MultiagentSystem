@@ -24,7 +24,7 @@ void Unit::setTargetPosition(Vector3 newTarget)
 	Vector2 buf = { targetPosition.x - position.x, targetPosition.z - position.z };
 	float vectorLength = sqrtf(pow(buf.x, 2) + pow(buf.y, 2));
 	directionalVector = { buf.x / vectorLength, buf.y / vectorLength };
-	direction = Vector2Angle(position, targetPosition);
+	direction = atan2f(directionalVector.x, directionalVector.y)* RAD2DEG;
 
 	state = State::MOVING;
 }
@@ -35,8 +35,6 @@ void Unit::Move()
 	position.z += directionalVector.y * speed;
 
 	positionTile = map->getTileIndexFromVector(position);
-	
-	
 }
 
 Digger::Digger(Vector3 position, Map* map, Model model)
@@ -82,11 +80,13 @@ void Digger::Update()
 	default:
 		break;
 	}
-
 }
 
 void Digger::Draw()
 {
-	DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.05f, 0.05f, 0.05f}, WHITE);
-	//DrawModel(model, position, 0.25f, WHITE);
+	// to shift model for better rotation
+	model.transform = MatrixTranslate(-25.f, 0, -25.f);
+	DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.05f, 0.05f, 0.05f }, WHITE);
+	DrawSphere(position, 1, RED);
+	
 }

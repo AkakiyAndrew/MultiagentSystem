@@ -1,8 +1,5 @@
 #pragma once
-
-#include "include/raylib.h"
-#include "include/raymath.h"
-#include <math.h>
+#include "Enums.h"
 
 #define TURN_DEG 3 * DEG2RAD
 #define PLAYER_SPEED 30.0f

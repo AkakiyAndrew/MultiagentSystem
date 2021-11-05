@@ -1,4 +1,9 @@
 #pragma once
+#include "include/raylib.h"
+#include "include/raymath.h"
+#include "include/raylib.h"
+#include <algorithm>
+#include <math.h>
 
 enum class State
 {
@@ -33,9 +38,9 @@ struct TileIndex
 	}
 };
 
-inline int Vector2Angle(Vector3 v1, Vector3 v2)
+inline float Vector2Angle(Vector3 v1, Vector3 v2)
 {
-	int result = atan2f(v2.y - v1.y, v2.x - v1.x) * (180.0f / PI);
+	float result = atan2f(v2.y - v1.y, v2.x - v1.x) * (180.0f / PI);
 	if (result < 0) result += 360.0f;
 	return result;
 }

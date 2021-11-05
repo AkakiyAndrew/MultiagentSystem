@@ -1,6 +1,5 @@
 #pragma once
 #include "Map.h"
-#include "include/raylib.h"
 #include "Enums.h"
 
 class Unit
@@ -11,7 +10,7 @@ protected:
 	TileIndex positionTile;
 	Vector3 targetPosition;
 	TileIndex targetPositionTile;
-	Vector2 directionalVector;
+	Vector2 directionalVector = {0.f, 1.f};
 	float speed;
 	float direction;
 

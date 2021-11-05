@@ -1,6 +1,4 @@
 #pragma once
-#include "include/raylib.h"
-#include <algorithm>
 #include "Enums.h"
 
 class Map
