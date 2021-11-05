@@ -1,7 +1,7 @@
 #include "Units.h"
 
 Unit::Unit(Vector3 position, Map* map, Model model)
-	:position(position), map(map), model(model), speed(1.f), targetPosition(position)
+	:position(position), map(map), model(model), speed(0.25f), targetPosition(position)
 {
 	positionTile = map->getTileIndexFromVector(position);
 	targetPositionTile = positionTile;
@@ -20,6 +20,13 @@ void Unit::setTargetPosition(Vector3 newTarget)
 {
 	targetPosition = newTarget;
 	targetPositionTile = map->getTileIndexFromVector(newTarget);
+
+	Vector2 buf = { targetPosition.x - position.x, targetPosition.z - position.z };
+	float vectorLength = sqrtf(pow(buf.x, 2) + pow(buf.y, 2));
+	directionalVector = { buf.x / vectorLength, buf.y / vectorLength };
+	direction = Vector2Angle(position, targetPosition);
+
+	state = State::MOVING;
 }
 
 void Unit::Move()
@@ -28,6 +35,8 @@ void Unit::Move()
 	position.z += directionalVector.y * speed;
 
 	positionTile = map->getTileIndexFromVector(position);
+	
+	
 }
 
 Digger::Digger(Vector3 position, Map* map, Model model)
@@ -43,7 +52,7 @@ Digger::~Digger()
 void Digger::Update()
 {
 	//in any state change y-axis (height)
-	position.y += (map->getActualHeight(positionTile.x, positionTile.z) - position.y) * 0.5;
+	position.y = map->getActualHeight(positionTile.x, positionTile.z) * 1.1;
 
 	switch (state)
 	{
@@ -51,12 +60,7 @@ void Digger::Update()
 		if (positionTile != targetPositionTile)
 		{
 			//get directional vector
-			Vector2 buf = { targetPosition.x - position.x, targetPosition.z - position.z };
-			float vectorLength = sqrtf(pow(buf.x, 2) + pow(buf.y, 2));
-			directionalVector = { buf.x / vectorLength, buf.y / vectorLength };
-			direction = Vector2Angle(position, targetPosition);
-
-			state = State::MOVING;
+			
 		}
 		else
 		{
@@ -83,5 +87,6 @@ void Digger::Update()
 
 void Digger::Draw()
 {
-	DrawModel(model, position, 0.25f, WHITE);
+	DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.05f, 0.05f, 0.05f}, WHITE);
+	//DrawModel(model, position, 0.25f, WHITE);
 }

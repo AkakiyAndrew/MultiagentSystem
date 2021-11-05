@@ -8,6 +8,17 @@
 //constexpr float FOVY_PERSPECTIVE = 45.0f;
 //constexpr float WIDTH_ORTHOGRAPHIC = 10.0f;
 
+Ray getRayFromCamera(Camera camera)
+{
+    Ray result = {0};
+    Vector3 buf = Vector3Subtract(camera.target, camera.position);
+    float distance = Vector3Distance(camera.target, camera.position);
+    result.position = camera.position;
+    result.direction = Vector3{ buf.x / distance, buf.y / distance, buf.z / distance };
+
+    return result;
+}
+
 int main(void)
 {
     // Initialization
@@ -36,10 +47,10 @@ int main(void)
 
     Map map = Map(shader);
 
-    Model diggerModel = LoadModel("output.obj");
+    Model diggerModel = LoadModel("Digger.obj");
     
     diggerModel.materials[0].shader = shader;
-    //diggerModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, BLUE));
+    diggerModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, BLUE));
     Digger digger = Digger(Vector3{ 0.f,0.f,0.f }, &map, diggerModel);
 
     Vector3 cubePosition = { 0.0f, 1.0f, 0.0f };
@@ -55,7 +66,7 @@ int main(void)
     int radius = 2;
     // Define our custom camera
     Vector2 mapSize = map.getMapSize();
-    CustomCamera camera = CustomCamera({ 18.0f, 18.0f, 18.0f }, { mapSize.x / 2, 0.0f, mapSize.y / 2 }, { 0.0f, 1.0f, 0.0f }, 45.0f, CAMERA_PERSPECTIVE, { screenWidth, screenHeight });
+    CustomCamera camera = CustomCamera({ 18.0f, 18.0f, 18.0f }, { 9.f, 0.0f, 9.f }, { 0.0f, 1.0f, 0.0f }, 45.0f, CAMERA_PERSPECTIVE, { screenWidth, screenHeight });
 
     SetTargetFPS(60);                       // Set our game to run at 60 frames-per-second
 
@@ -106,11 +117,16 @@ int main(void)
         {
             digger.setTargetPosition({ 5,5,5 });
         }
+        if (IsKeyPressed(KEY_G))
+        {
+            digger.setTargetPosition({ 0,0,0 });
+        }
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
-            ray = GetMouseRay(GetMousePosition(), camera.camera);
-
+            //ray = GetMouseRay(GetMousePosition(), camera.camera);
+            ray = getRayFromCamera(camera.camera);
+            // получить луч из позиции камеры и её цели
             // Check collision between ray and box
             collisionBox = GetRayCollisionBox(ray,
                 BoundingBox{
@@ -124,6 +140,19 @@ int main(void)
 
                 // if box isnt hitted - check collision with plane
                 map.planTerraform(ray, radius, true);
+            }
+        }
+
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+        {
+            //ray = GetMouseRay(GetMousePosition(), camera.camera);
+            ray = getRayFromCamera(camera.camera);
+
+            RayCollision collisionMesh = map.getRayCollision(ray);
+
+            if (collisionMesh.hit)
+            {
+                digger.setTargetPosition({ collisionMesh.point.x, 0, collisionMesh.point.z });
             }
         }
 

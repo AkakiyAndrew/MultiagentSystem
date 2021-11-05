@@ -17,7 +17,7 @@ protected:
 
 	//visual
 	Model model;
-	bool isVisible;
+	bool isVisible = true;
 	
 	//system
 	int ID; //dont need?

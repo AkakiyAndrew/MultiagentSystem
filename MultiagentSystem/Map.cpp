@@ -1,14 +1,12 @@
 #include "Map.h"
 
-#define GRAY_VALUE(c) ((c.r+c.g+c.b)/3)
-
 Map::Map(Shader shader)
 {
     Image image = LoadImage("heightmap.png");
 
     length = image.height;
     width = image.width;
-    maxHeight = 64;
+    maxHeight = 1;
     sizeMultiplier = 1.f;
 
     textureTerraformPlan = LoadRenderTexture(width, length);
@@ -211,6 +209,11 @@ Vector2 Map::getMapSize()
     return Vector2{ static_cast<float>(width), static_cast<float>(length) };
 }
 
+Vector2 Map::getActualMapSize()
+{
+    return Vector2{ width * sizeMultiplier, length * sizeMultiplier };
+}
+
 Texture Map::getMinimapTexture()
 {
     if (terraformPlanDraw)
@@ -221,21 +224,26 @@ Texture Map::getMinimapTexture()
 
 TileIndex Map::getTileIndexFromVector(Vector3 position)
 {
-    return TileIndex(
-        static_cast<int>((position.x * width) / (sizeMultiplier * width - position.x)),
-        static_cast<int>((position.z * length) / (sizeMultiplier * length - position.z))
+    TileIndex result = {
+        static_cast<int>(position.x / sizeMultiplier),
+        static_cast<int>(position.z / sizeMultiplier)
+    };
+    return result;
+}
+
+RayCollision Map::getRayCollision(Ray ray)
+{
+    return GetRayCollisionQuad(ray,
+        position, //left-up
+        { position.x, position.y, length * sizeMultiplier }, //left-down
+        { width * sizeMultiplier, position.y, length * sizeMultiplier }, //right-down
+        { width * sizeMultiplier, position.y, position.z } //right-up 
     );
 }
 
 void Map::planTerraform(Ray ray, int radius, bool state)
 {
-    RayCollision collisionMesh = GetRayCollisionQuad(ray,
-        position, //left-up
-        { position.x, position.y, length * sizeMultiplier }, //left-down
-        { width * sizeMultiplier, position.y, length * sizeMultiplier }, //right-down
-        { width * sizeMultiplier, position.y, position.z } //right-up 
-    ); 
-        
+    RayCollision collisionMesh = getRayCollision(ray);
     
     if (collisionMesh.hit)
     {

@@ -34,8 +34,10 @@ public:
 	float getActualHeight(int x, int z);
 	bool getTerraformPlanState(int x, int z);
 	Vector2 getMapSize();
+	Vector2 getActualMapSize();
 	Texture getMinimapTexture();
 	TileIndex getTileIndexFromVector(Vector3 position);
+	RayCollision getRayCollision(Ray ray);
 
 	void switchTerraformDraw();
 	void Draw();
