@@ -1,6 +1,5 @@
 #pragma once
 #include "Map.h"
-#include "Enums.h"
 
 class Unit
 {
@@ -44,8 +43,23 @@ private:
 public:
 	Digger(Vector3 position, Map* map, Model model);
 	~Digger();
-
 	void Update();
 	void Draw();
+
+};
+
+class Brigadier : public Unit
+{
+	static const int maxNumOfDiggers = 1;
+
+	//Digger siblings[maxNumOfDiggers];
+
+public:
+	Brigadier(Vector3 position, Map* map, Model model);
+	~Brigadier();
+	void Update();
+	void Draw();
+
+	TileIndex getTileToTerraform(bool state);
 
 };

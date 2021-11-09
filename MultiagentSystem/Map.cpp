@@ -1,6 +1,6 @@
 #include "Map.h"
 
-Map::Map(Shader shader)
+Map::Map(Shader shader, short zeroLayerHeight)
 {
     Image image = LoadImage("heightmap.png");
 
@@ -8,6 +8,7 @@ Map::Map(Shader shader)
     width = image.width;
     maxHeight = 16;
     sizeMultiplier = 1.f;
+    zeroLayerLevel = zeroLayerHeight;
 
     textureTerraformPlan = LoadRenderTexture(width, length);
     BeginTextureMode(textureTerraformPlan);

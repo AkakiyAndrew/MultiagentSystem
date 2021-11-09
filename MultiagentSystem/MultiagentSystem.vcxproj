@@ -147,12 +147,16 @@
     <ClCompile Include="CustomCamera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="rlight.cpp" />
+    <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Units.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomCamera.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="rlight.h" />
+    <ClInclude Include="Simulation.h" />
     <ClInclude Include="Units.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

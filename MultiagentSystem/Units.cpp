@@ -90,3 +90,22 @@ void Digger::Draw()
 	DrawSphere(position, 1, RED);
 	
 }
+
+Brigadier::Brigadier(Vector3 position, Map* map, Model model)
+	:Unit(position, map, model)
+{
+	/*for(int i = 0; i<maxNumOfDiggers; i++)
+		siblings[i] = Digger(position, map, )*/
+}
+
+Brigadier::~Brigadier()
+{
+}
+
+void Brigadier::Update()
+{
+}
+
+void Brigadier::Draw()
+{
+}

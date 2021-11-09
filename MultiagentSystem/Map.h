@@ -17,10 +17,10 @@ class Map
 	short** heightMap = nullptr;
 	bool** terraformPlanMap = nullptr;
 	bool terraformPlanDraw = false;
-	short zeroLayerLevel = 125;
+	short zeroLayerLevel;
 
 public:
-	Map(Shader shader);
+	Map(Shader shader, short zeroLayerLevel);
 	//sets height in specified position
 	void setHeight(int x, int z, short height);
 	//set terraform plan to desired state
