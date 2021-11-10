@@ -205,9 +205,9 @@ float Map::getActualHeight(int x, int z)
     return heightMap[z][x] * (maxHeight * sizeMultiplier / 255.f);
 }
 
-Vector2 Map::getMapSize()
+TileIndex Map::getMapSize()
 {
-    return Vector2{ static_cast<float>(width), static_cast<float>(length) };
+    return TileIndex{ width, length };
 }
 
 Vector2 Map::getActualMapSize()

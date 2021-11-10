@@ -26,7 +26,7 @@ Simulation::Simulation(int screenWidth, int screenHeight)
 
     map = new Map(lightShader, 125);
     // Define our custom camera
-    Vector2 mapSize = map->getMapSize();
+    
     customCamera = new CustomCamera(
         { 18.0f, 18.0f, 18.0f },
         { 9.f, 0.0f, 9.f },
@@ -39,6 +39,10 @@ Simulation::Simulation(int screenWidth, int screenHeight)
     diggerModel = LoadModel("Digger.obj");
     diggerModel.materials[0].shader = lightShader;
     diggerModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, BLUE));
+
+    brigadierModel = LoadModel("Brigadier.obj");
+    brigadierModel.materials[0].shader = lightShader;
+    brigadierModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, ORANGE));
     //Digger digger = Digger(Vector3{ 0.f,0.f,0.f }, &map, diggerModel);
 
     Vector3 cubePosition = { 0.0f, 1.0f, 0.0f };
@@ -145,6 +149,8 @@ void Simulation::Draw()
     BeginMode3D(customCamera->camera);
     /*DrawLine3D(Vector3{ 0.f, 0.f, 0.f }, Vector3{1.f, 0.f, 0.f}, DARKBLUE);*/
     map->Draw();
+
+    DrawModel(brigadierModel, { 0,0,0 }, 0.5f, WHITE);
 
     //digger.Draw();
     //if (collisionBox.hit)

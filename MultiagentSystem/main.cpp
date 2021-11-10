@@ -2,8 +2,6 @@
 
 int main(void)
 {
-    // Initialization
-    //--------------------------------------------------------------------------------------
     const int screenWidth = 1000;
     const int screenHeight = 500;
 
@@ -14,7 +12,7 @@ int main(void)
     SetTargetFPS(60);                       // Set our game to run at 60 frames-per-second
 
     // Main game loop
-    while (!WindowShouldClose())            // Detect window close button or ESC key
+    while (!WindowShouldClose())
     {
         /*if (IsKeyPressed(KEY_SPACE))
         {
@@ -32,16 +30,10 @@ int main(void)
 
         simulation.Update();
         simulation.Draw();
-
-        
-        //----------------------------------------------------------------------------------
     }
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
 
-    CloseWindow();              // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
+    CloseWindow();
 
     return 0;
 }

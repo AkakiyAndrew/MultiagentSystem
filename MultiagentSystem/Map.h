@@ -29,7 +29,7 @@ public:
 	short getHeight(int x, int z);
 	float getActualHeight(int x, int z);
 	bool getTerraformPlanState(int x, int z);
-	Vector2 getMapSize();
+	TileIndex getMapSize();
 	Vector2 getActualMapSize();
 	Texture getMinimapTexture();
 	TileIndex getTileIndexFromVector(Vector3 position);

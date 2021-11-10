@@ -91,6 +91,8 @@ void Digger::Draw()
 	
 }
 
+
+
 Brigadier::Brigadier(Vector3 position, Map* map, Model model)
 	:Unit(position, map, model)
 {
@@ -108,4 +110,41 @@ void Brigadier::Update()
 
 void Brigadier::Draw()
 {
+}
+
+TileIndex Brigadier::getTileToTerraform(bool state)
+{
+	TileIndex result = { -1, -1 };
+	TileIndex center = positionTile;
+	TileIndex mapSize = map->getMapSize();
+	int maxRadius = std::max<int>(
+		std::max<int>((center.x), (mapSize.x - center.x - 1)),
+		std::max<int>((center.z), (mapSize.z - center.z - 1))
+		);
+
+	TileIndex leftUp, rightDown;
+
+	//TODO: check current TileIndex
+
+	for (int r = 1; r < maxRadius; r++)
+	{
+		//TODO: checks bounds of map IN LOOPS INITIALISATIONS - USE CLAMPS?
+		for (int x = center.x - r, int z = center.z-r; x < center.x + r; x++)
+		{
+			
+			//TODO: check for tile with desired properties
+		}
+
+		for (int x = center.x + r, int z = center.z - r + 1; z < center.z + r; z++)
+		{
+			//TODO: checks bounds of map
+			//TODO: check for tile with desired properties
+		}
+
+
+	}
+
+
+
+	return result;
 }
