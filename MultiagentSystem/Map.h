@@ -37,6 +37,7 @@ public:
 	Vector2 getActualMapSize();
 	Texture getMinimapTexture();
 	TileIndex getTileIndexFromVector(Vector3 position);
+	Vector3 getVectorFromTileIndex(TileIndex tile);
 	RayCollision getRayCollision(Ray ray);
 
 	void switchTerraformDraw();

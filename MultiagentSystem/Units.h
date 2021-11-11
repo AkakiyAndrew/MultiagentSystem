@@ -39,12 +39,18 @@ class Brigadier;
 class Digger: public Unit
 {
 private:
-	int capacityMax;
-	int capacityCurrent;
+	const int capacityMax = 20;
+	int cargoCurrent = 0;
+	const int heighPerOperation = 5;
+	const int operationTicksMax = 120;
+	int operationTicksLasts;
+
 	Brigadier* parent = nullptr;
-	
+	Task task;
+	void Scan();
+
 public:
-	Digger(Vector3 position, Map* map, Model model);
+	Digger(Vector3 position, Map* map, Model model, Brigadier* parent);
 	~Digger();
 	void Update();
 	void Draw();
@@ -54,7 +60,7 @@ class Brigadier : public Unit
 {
 	const int maxNumOfDiggers = 1;
 
-	Digger *siblings;
+	Digger **siblings = nullptr;
 
 public:
 	Brigadier(Vector3 position, Map* map, Model model, Model diggerModel);

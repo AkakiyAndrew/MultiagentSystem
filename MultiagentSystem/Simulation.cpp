@@ -50,9 +50,7 @@ Simulation::Simulation(int screenWidth, int screenHeight)
     Model cube = LoadModelFromMesh(cubeMesh);
     cube.materials[0].shader = lightShader;
 
-    Ray ray = { 0 };                    // Picking line ray
-    RayCollision collisionBox = { 0 };
-    RayCollision collisionMesh = { 0 };
+    brigadier = new Brigadier({ 0,0,0 }, map, brigadierModel, diggerModel);
 }
 
 Simulation::~Simulation()
@@ -106,16 +104,15 @@ void Simulation::Update()
     //    Ray ray = getRayFromCamera(customCamera->camera);
     //    // получить луч из позиции камеры и её цели
     //    // Check collision between ray and box
-    //    collisionBox = GetRayCollisionBox(ray,
+
+    //    RayCollision collisionBox = GetRayCollisionBox(ray,
     //        BoundingBox{
     //            Vector3{ cubePosition.x - cubeSize.x / 2, cubePosition.y - cubeSize.y / 2, cubePosition.z - cubeSize.z / 2 },
     //            Vector3{ cubePosition.x + cubeSize.x / 2, cubePosition.y + cubeSize.y / 2, cubePosition.z + cubeSize.z / 2 }
     //        });
-
     //    if (!collisionBox.hit)
     //    {
     //        collisionBox.hit = false;
-
     //        // if box isnt hitted - check collision with plane
     //        map->planTerraform(ray, toolRadius, toolMode);
     //    }
@@ -156,7 +153,6 @@ void Simulation::Draw()
     //{
     //    DrawModel(cube, cubePosition, 1.f, RED);
     //    DrawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON);
-
     //    DrawCubeWires(cubePosition, cubeSize.x + 0.2f, cubeSize.y + 0.2f, cubeSize.z + 0.2f, GREEN);
     //}
     //else

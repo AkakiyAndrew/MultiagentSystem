@@ -37,14 +37,58 @@ void Unit::Move()
 	positionTile = map->getTileIndexFromVector(position);
 }
 
-Digger::Digger(Vector3 position, Map* map, Model model)
+Digger::Digger(Vector3 position, Map* map, Model model, Brigadier *brigadier)
 	:Unit(position, map, model)
 {
-
+	isVisible = false;
+	parent = brigadier;
+	state = State::IDLE;
+	task = Task::GRAB;
+	operationTicksLasts = operationTicksMax;
 }
 
 Digger::~Digger()
 {
+}
+
+void Digger::Scan()
+{
+	TileIndex tile;
+	if (task == Task::GRAB)
+	{	
+		tile = parent->getTileToTerraform(true, false);
+		if (tile.x == -1) // if cant find - try again with unplanned terrain
+		{
+			tile = parent->getTileToTerraform(true, true);
+			if (tile.x == -1) // if cant find - return to parent
+			{
+				task = Task::RETURN;
+				setTargetPosition(parent->getPosition());
+				return;
+			}
+		}
+		//if tile has found:
+		task = Task::GRAB; //previous task remains
+		setTargetPosition(map->getVectorFromTileIndex(tile));
+	}
+	if(task == Task::PUT)
+	{
+		tile = parent->getTileToTerraform(false, false);
+		if (tile.x == -1) // if cant find - try again with unplanned terrain
+		{
+			tile = parent->getTileToTerraform(false, true);
+			if (tile.x == -1) // if cant find - return to parent
+			{
+				task = Task::RETURN;
+				setTargetPosition(parent->getPosition());
+				return;
+			}
+		}
+		//if tile has found:
+		task = Task::PUT; //previous task remains
+		setTargetPosition(map->getVectorFromTileIndex(tile));
+	}
+	isVisible = true; //becomes visible if found tile
 }
 
 void Digger::Update()
@@ -54,16 +98,90 @@ void Digger::Update()
 
 	switch (state)
 	{
+	case State::ATTACHED:
+		position = parent->getPosition();
+		positionTile = map->getTileIndexFromVector(position);
+		Scan();
+		break;
 	case State::IDLE:
-		if (positionTile != targetPositionTile)
+		Scan();
+		//scan for tiles to terraform (OR IN State::ATTACHED?
+		break;
+	case State::MOVING:
+		if (positionTile == targetPositionTile)
 		{
-			//get directional vector
-			
+			switch (task)
+			{
+			case Task::GRAB:
+			case Task::PUT:
+				state = State::TERRAFORMING;
+				break;
+			case Task::RETURN:
+				state = State::ATTACHED;
+				isVisible = false;
+				break;
+			}
 		}
 		else
 		{
-			//checking for tiles around Brigadier to terraform
+			Move();
 		}
+		break;
+	case State::TERRAFORMING:
+		if (operationTicksLasts == 0)
+		{
+			operationTicksLasts = operationTicksMax;
+			switch (task)
+			{
+			case Task::GRAB:
+				short height = map->getHeight(positionTile.x, positionTile.z);
+				if(height )
+				break;
+			case Task::PUT:
+				break;
+			}
+			break;
+		}
+		else
+		{
+			operationTicksLasts--;
+		}
+	}
+}
+
+void Digger::Draw()
+{
+	// to shift model for better rotation
+	if (isVisible)
+	{
+		model.transform = MatrixTranslate(-25.f, 0, -25.f);
+		DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.05f, 0.05f, 0.05f }, WHITE);
+		//DrawSphere(position, 1, RED);
+	}
+}
+
+
+
+Brigadier::Brigadier(Vector3 position, Map* map, Model model, Model diggerModel)
+	:Unit(position, map, model)
+{
+	state = State::IDLE;
+	siblings = new Digger * [maxNumOfDiggers];
+	for (int i = 0; i < maxNumOfDiggers; i++)
+		siblings[i] = new Digger(position, map, diggerModel, this);
+}
+
+Brigadier::~Brigadier()
+{
+	delete[] siblings;
+}
+
+void Brigadier::Update()
+{
+	position.y = map->getActualHeight(positionTile.x, positionTile.z) * 1.1;
+	switch (state)
+	{
+	case State::IDLE:
 		break;
 	case State::MOVING:
 		if (positionTile == targetPositionTile)
@@ -75,37 +193,9 @@ void Digger::Update()
 			Move();
 		}
 		break;
-	case State::TERRAFORMING:
-		break;
 	default:
 		break;
 	}
-}
-
-void Digger::Draw()
-{
-	// to shift model for better rotation
-	model.transform = MatrixTranslate(-25.f, 0, -25.f);
-	DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.05f, 0.05f, 0.05f }, WHITE);
-	DrawSphere(position, 1, RED);
-	
-}
-
-
-
-Brigadier::Brigadier(Vector3 position, Map* map, Model model, Model diggerModel)
-	:Unit(position, map, model)
-{
-	for (int i = 0; i < maxNumOfDiggers; i++)
-		siblings[i] = Digger(position, map, diggerModel);
-}
-
-Brigadier::~Brigadier()
-{
-}
-
-void Brigadier::Update()
-{
 }
 
 void Brigadier::Draw()
@@ -124,7 +214,7 @@ bool checkTileForTerraform(bool checkUnplannedTerrain, bool heightState, Map *ma
 		}
 		else
 		{
-			if (zeroLayerLevel < map->getHeight(x, z))
+			if (zeroLayerLevel < map->getHeight(x, z) && map->getHeight(x, z) != 1) // tiles with 1 height cant be digged
 				return true;
 		}
 	}

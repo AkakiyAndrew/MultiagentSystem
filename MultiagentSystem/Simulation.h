@@ -20,6 +20,8 @@ private:
 	Model diggerModel;
 	Model brigadierModel;
 
+	Brigadier* brigadier;
+
 public:
 	Simulation(int screenWidth, int screenHeight);
 	~Simulation();

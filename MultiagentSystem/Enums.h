@@ -8,9 +8,17 @@
 
 enum class State
 {
+	ATTACHED,
 	IDLE,
 	MOVING,
 	TERRAFORMING
+};
+
+enum class Task
+{
+	GRAB,
+	PUT,
+	RETURN
 };
 
 struct TileIndex

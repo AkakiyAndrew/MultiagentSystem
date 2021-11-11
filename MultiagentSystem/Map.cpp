@@ -220,6 +220,15 @@ TileIndex Map::getTileIndexFromVector(Vector3 position)
     return result;
 }
 
+Vector3 Map::getVectorFromTileIndex(TileIndex tile)
+{
+    return Vector3{
+        tile.x * sizeMultiplier,
+        getActualHeight(tile.x, tile.z),
+        tile.z * sizeMultiplier
+    };
+}
+
 RayCollision Map::getRayCollision(Ray ray)
 {
     return GetRayCollisionQuad(ray,
