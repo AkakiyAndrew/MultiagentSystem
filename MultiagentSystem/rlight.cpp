@@ -24,7 +24,7 @@ Light CreateLight(int type, Vector3 position, Vector3 target, Color color, Shade
         light.target = target;
         light.color = color;
 
-        // TODO: Below code doesn't look good to me, 
+        // Below code doesn't look good to me, 
         // it assumes a specific shader naming and structure
         // Probably this implementation could be improved
         char enabledName[32] = "lights[x].enabled\0";

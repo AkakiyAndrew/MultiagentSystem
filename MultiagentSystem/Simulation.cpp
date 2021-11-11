@@ -43,10 +43,9 @@ Simulation::Simulation(int screenWidth, int screenHeight)
     brigadierModel = LoadModel("Brigadier.obj");
     brigadierModel.materials[0].shader = lightShader;
     brigadierModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, ORANGE));
-    //Digger digger = Digger(Vector3{ 0.f,0.f,0.f }, &map, diggerModel);
 
-    Vector3 cubePosition = { 0.0f, 1.0f, 0.0f };
-    Vector3 cubeSize = { 2.0f, 2.0f, 2.0f };
+    Vector3 cubePosition = { 0.0f, 2.0f, 0.0f };
+    Vector3 cubeSize = { 1.0f, 1.0f, 1.0f };
     Mesh cubeMesh = GenMeshCube(cubeSize.x, cubeSize.x, cubeSize.x);
     Model cube = LoadModelFromMesh(cubeMesh);
     cube.materials[0].shader = lightShader;
@@ -81,18 +80,17 @@ void Simulation::Update()
     }
 
     if (IsKeyPressed(KEY_TAB))
-    {
         map->switchTerraformDraw();
-    }
+
+    if (IsKeyPressed(KEY_F1))
+        map->switchZerolayerDraw();
 
     if (IsKeyPressed(KEY_KP_ADD))
-    {
         toolRadius++;
-    }
+
     if (IsKeyPressed(KEY_KP_SUBTRACT))
-    {
         toolRadius--;
-    }
+
     //if (IsKeyPressed(KEY_F))
     //{
     //    digger.setTargetPosition({ 5,5,5 });
@@ -148,9 +146,10 @@ void Simulation::Draw()
 
     BeginMode3D(customCamera->camera);
     /*DrawLine3D(Vector3{ 0.f, 0.f, 0.f }, Vector3{1.f, 0.f, 0.f}, DARKBLUE);*/
-    map->Draw();
+    
 
     DrawModel(brigadierModel, { 0,0,0 }, 0.5f, WHITE);
+    map->Draw();
 
     //digger.Draw();
     //if (collisionBox.hit)

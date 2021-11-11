@@ -23,6 +23,10 @@ Map::Map(Shader shader, short zeroLayerHeight)
     model.materials[0].shader = shader;
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture; // Set map diffuse texture
     
+    zerolayerPlane = LoadModelFromMesh(GenMeshPlane(sizeMultiplier * width, sizeMultiplier * length, 1, 1));
+    zerolayerPlane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, Fade(PURPLE, 0.25f)));
+    zerolayerPlanePosition = Vector3{ position.x + (width * sizeMultiplier) / 2, zeroLayerLevel * (maxHeight * sizeMultiplier / 255.f),position.z + width * sizeMultiplier / 2 };
+
     //memory allocation
     heightMap = new short* [length];
     for (int i = 0; i < length; i++)
@@ -52,38 +56,6 @@ Map::Map(Shader shader, short zeroLayerHeight)
         for (int j = 0; j < width; j++)
             terraformPlanMap[i][j] = false;
 
-
-    //textureTerraformPlot - texture for highlighting
-    //Color* colorPixels = new Color[width * length];
-    //int index;
-    //for (int z = 0; z < length; z++)
-    //{
-    //    for (int x = 0; x < width; x++)
-    //    {
-    //        index = z * width + x;
-    //        if (terraformPlanMap[z][x] == true)
-    //        {
-    //            /*if (heightMap[z][x] == zeroLayerLevel)
-    //                colorPixels[index] = GREEN;
-    //            else*/
-    //            colorPixels[index] = BLUE;
-    //        }
-    //        else
-    //        {
-    //            colorPixels[index] = RED;
-    //        }
-    //    }
-    //}
-    //Image colorImage = {
-    //    colorPixels,
-    //    width,
-    //    length,
-    //    1,
-    //    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
-    //};
-    //textureTerraformPlot.texture = LoadTextureFromImage(colorImage);
-    //delete[] colorPixels;
-
     UnloadImage(image);
 }
 
@@ -105,11 +77,22 @@ Map::~Map()
     UnloadRenderTexture(textureTerraformPlan);
 }
 
+void Map::switchZerolayerDraw()
+{
+    if (zerolayerPlaneDraw)
+        zerolayerPlaneDraw = false;
+    else
+        zerolayerPlaneDraw = true;
+}
+
 void Map::Draw()
 {
     DrawModel(model, position, 1.0f, GRAY);
-    DrawModelWires(model, position, 1, DARKGRAY);
+    DrawModelWires(model, position, 1.f, DARKGRAY);
 
+    if(zerolayerPlaneDraw)
+        DrawModel(zerolayerPlane, zerolayerPlanePosition, 1.f, WHITE);
+    
     //DrawGrid(20, 1.0f);
 }
 
@@ -198,6 +181,11 @@ bool Map::getTerraformPlanState(int x, int z)
 short Map::getHeight(int x, int z)
 {
     return heightMap[z][x];
+}
+
+short Map::getZeroLayerLevel()
+{
+    return zeroLayerLevel;
 }
 
 float Map::getActualHeight(int x, int z)

@@ -93,11 +93,11 @@ void Digger::Draw()
 
 
 
-Brigadier::Brigadier(Vector3 position, Map* map, Model model)
+Brigadier::Brigadier(Vector3 position, Map* map, Model model, Model diggerModel)
 	:Unit(position, map, model)
 {
-	/*for(int i = 0; i<maxNumOfDiggers; i++)
-		siblings[i] = Digger(position, map, )*/
+	for (int i = 0; i < maxNumOfDiggers; i++)
+		siblings[i] = Digger(position, map, diggerModel);
 }
 
 Brigadier::~Brigadier()
@@ -112,36 +112,93 @@ void Brigadier::Draw()
 {
 }
 
-TileIndex Brigadier::getTileToTerraform(bool state)
+//aux function for method below
+bool checkTileForTerraform(bool checkUnplannedTerrain, bool heightState, Map *map, int x, int z, short zeroLayerLevel)
+{
+	if (checkUnplannedTerrain == map->getTerraformPlanState(x, z))
+	{
+		if (heightState)
+		{
+			if (zeroLayerLevel > map->getHeight(x, z))
+				return true;
+		}
+		else
+		{
+			if (zeroLayerLevel < map->getHeight(x, z))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+// returns TileIndex with desired state (true for below-zeroLayer) and is tile must be in planned zone (true if yes)
+TileIndex Brigadier::getTileToTerraform(bool heightState, bool checkUnplannedTerrain)
 {
 	TileIndex result = { -1, -1 };
 	TileIndex center = positionTile;
 	TileIndex mapSize = map->getMapSize();
+	short zeroLayerLevel = map->getZeroLayerLevel();
 	int maxRadius = std::max<int>(
-		std::max<int>((center.x), (mapSize.x - center.x - 1)),
-		std::max<int>((center.z), (mapSize.z - center.z - 1))
+		std::max<int>(center.x, mapSize.x - center.x - 1),
+		std::max<int>(center.z, mapSize.z - center.z - 1)
 		);
 
 	TileIndex leftUp, rightDown;
 
-	//TODO: check current TileIndex
+	//checking current tile
+	if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, center.x, center.z, zeroLayerLevel))
+		return TileIndex{ center.x, center.z };
 
-	for (int r = 1; r < maxRadius; r++)
+	//TODO: add checking for assignments of other Diggers, who already got their targetTiles,
+	//to prevent sending them to only one tile
+	//OR
+	//make bool matrix for assignments
+
+	for (int r = 1; r <= maxRadius; r++)
 	{
-		//TODO: checks bounds of map IN LOOPS INITIALISATIONS - USE CLAMPS?
-		for (int x = center.x - r, int z = center.z-r; x < center.x + r; x++)
+		//leftUp
+		leftUp = {
+			center.x - r,
+			center.z - r
+		};
+		leftUp.x = std::clamp<int>(leftUp.x, 0, center.x);
+		leftUp.z = std::clamp<int>(leftUp.z, 0, center.z);
+		//rightDown
+		rightDown = {
+			center.x + r,
+			center.z + r
+		};
+		rightDown.x = std::clamp<int>(rightDown.x, center.x, mapSize.x - 1);
+		rightDown.z = std::clamp<int>(rightDown.z, center.z, mapSize.z - 1);
+
+		//upper row
+		for (int x = leftUp.x + 1, z = leftUp.z; x <= rightDown.x; x++)
 		{
-			
-			//TODO: check for tile with desired properties
+			if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
+				return TileIndex{ x,z };
 		}
 
-		for (int x = center.x + r, int z = center.z - r + 1; z < center.z + r; z++)
+		//right column
+		for (int x = rightDown.x, z = leftUp.z + 1; z <= rightDown.z; z++)
 		{
-			//TODO: checks bounds of map
-			//TODO: check for tile with desired properties
+			if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
+				return TileIndex{ x,z };
 		}
 
+		//bottom row
+		for (int x = rightDown.x - 1, z = rightDown.z; x >= leftUp.x; x--)
+		{
+			if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
+				return TileIndex{ x,z };
+		}
 
+		//left column
+		for (int x = leftUp.x, z = rightDown.z - 1; z >= leftUp.z; z--)
+		{
+			if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
+				return TileIndex{ x,z };
+		}
 	}
 
 

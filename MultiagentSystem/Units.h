@@ -34,32 +34,34 @@ public:
 	virtual void Draw() = 0;
 };
 
+class Brigadier;
+
 class Digger: public Unit
 {
 private:
 	int capacityMax;
 	int capacityCurrent;
+	Brigadier* parent = nullptr;
 	
 public:
 	Digger(Vector3 position, Map* map, Model model);
 	~Digger();
 	void Update();
 	void Draw();
-
 };
 
 class Brigadier : public Unit
 {
-	static const int maxNumOfDiggers = 1;
+	const int maxNumOfDiggers = 1;
 
-	//Digger siblings[maxNumOfDiggers];
+	Digger *siblings;
 
 public:
-	Brigadier(Vector3 position, Map* map, Model model);
+	Brigadier(Vector3 position, Map* map, Model model, Model diggerModel);
 	~Brigadier();
 	void Update();
 	void Draw();
 
-	TileIndex getTileToTerraform(bool state);
+	TileIndex getTileToTerraform(bool heightState, bool checkUnplannedTerrain);
 
 };
