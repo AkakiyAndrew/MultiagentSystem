@@ -20,9 +20,10 @@ class Map
 	bool** terraformPlanMap = nullptr;
 	bool terraformPlanDraw = false;
 	bool zerolayerPlaneDraw = false;
-	short zeroLayerLevel;
 
 public:
+	const short zeroLayerLevel;
+
 	Map(Shader shader, short zeroLayerLevel);
 	//sets height in specified position
 	void setHeight(int x, int z, short height);

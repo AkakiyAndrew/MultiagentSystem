@@ -65,12 +65,11 @@ Simulation::~Simulation()
 
 void Simulation::Update()
 {
-    // Update
     customCamera->Update();
     float cameraPos[3] = { customCamera->camera.position.x, customCamera->camera.position.y, customCamera->camera.position.z };
     SetShaderValue(lightShader, lightShader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
 
-    // Check key inputs to enable/disable lights
+    //INPUT FOR CONTROLS
     if (IsKeyPressed(KEY_Y))
     {
         lights[0].enabled = !lights[0].enabled;
@@ -98,33 +97,33 @@ void Simulation::Update()
     //    digger.setTargetPosition({ 0,0,0 });
     //}
 
-    //if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
-    //{
-    //    //ray = GetMouseRay(GetMousePosition(), customCamera->camera);
-    //    Ray ray = getRayFromCamera(customCamera->camera);
-    //    // получить луч из позиции камеры и её цели
-    //    // Check collision between ray and box
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    {
+        Ray ray = getRayFromCamera(customCamera->camera);
+        map->planTerraform(ray, toolRadius, toolMode);
 
-    //    RayCollision collisionBox = GetRayCollisionBox(ray,
-    //        BoundingBox{
-    //            Vector3{ cubePosition.x - cubeSize.x / 2, cubePosition.y - cubeSize.y / 2, cubePosition.z - cubeSize.z / 2 },
-    //            Vector3{ cubePosition.x + cubeSize.x / 2, cubePosition.y + cubeSize.y / 2, cubePosition.z + cubeSize.z / 2 }
-    //        });
-    //    if (!collisionBox.hit)
-    //    {
-    //        collisionBox.hit = false;
-    //        // if box isnt hitted - check collision with plane
-    //        map->planTerraform(ray, toolRadius, toolMode);
-    //    }
-    //}
+        // Check collision between ray and box
+        //RayCollision collisionBox = GetRayCollisionBox(ray,
+        //    BoundingBox{
+        //        Vector3{ cubePosition.x - cubeSize.x / 2, cubePosition.y - cubeSize.y / 2, cubePosition.z - cubeSize.z / 2 },
+        //        Vector3{ cubePosition.x + cubeSize.x / 2, cubePosition.y + cubeSize.y / 2, cubePosition.z + cubeSize.z / 2 }
+        //    });
+        //if (!collisionBox.hit)
+        //{
+        //    collisionBox.hit = false;
+        //    // if box isnt hitted - check collision with plane
+        //    map->planTerraform(ray, toolRadius, toolMode);
+        //}
+    }
+
+    //UNITS
+    brigadier->Update();
 
     //if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
     //{
     //    //ray = GetMouseRay(GetMousePosition(), customCamera->camera);
     //    Ray ray = getRayFromCamera(customCamera->camera);
-
     //    RayCollision collisionMesh = map->getRayCollision(ray);
-
     //    if (collisionMesh.hit)
     //    {
     //        digger.setTargetPosition({ collisionMesh.point.x, 0, collisionMesh.point.z });
@@ -144,8 +143,8 @@ void Simulation::Draw()
     BeginMode3D(customCamera->camera);
     /*DrawLine3D(Vector3{ 0.f, 0.f, 0.f }, Vector3{1.f, 0.f, 0.f}, DARKBLUE);*/
     
+    brigadier->Draw();
 
-    DrawModel(brigadierModel, { 0,0,0 }, 0.5f, WHITE);
     map->Draw();
 
     //digger.Draw();

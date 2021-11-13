@@ -1,6 +1,7 @@
 #include "Map.h"
 
 Map::Map(Shader shader, short zeroLayerHeight)
+    :zeroLayerLevel(zeroLayerHeight)
 {
     Image image = LoadImage("heightmap.png");
 
@@ -8,7 +9,6 @@ Map::Map(Shader shader, short zeroLayerHeight)
     width = image.width;
     maxHeight = 16;
     sizeMultiplier = 1.f;
-    zeroLayerLevel = zeroLayerHeight;
 
     textureTerraformPlan = LoadRenderTexture(width, length);
     BeginTextureMode(textureTerraformPlan);
@@ -223,9 +223,9 @@ TileIndex Map::getTileIndexFromVector(Vector3 position)
 Vector3 Map::getVectorFromTileIndex(TileIndex tile)
 {
     return Vector3{
-        tile.x * sizeMultiplier,
+        tile.x * sizeMultiplier + 0.5f * sizeMultiplier,
         getActualHeight(tile.x, tile.z),
-        tile.z * sizeMultiplier
+        tile.z * sizeMultiplier + 0.5f * sizeMultiplier
     };
 }
 

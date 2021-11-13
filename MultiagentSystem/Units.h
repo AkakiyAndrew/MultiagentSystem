@@ -39,10 +39,10 @@ class Brigadier;
 class Digger: public Unit
 {
 private:
-	const int capacityMax = 20;
+	const int capacity = 20;
 	int cargoCurrent = 0;
-	const int heighPerOperation = 5;
-	const int operationTicksMax = 120;
+	const int heighPerOperation = 10;
+	const int operationTicksMax = 30;
 	int operationTicksLasts;
 
 	Brigadier* parent = nullptr;
@@ -68,6 +68,6 @@ public:
 	void Update();
 	void Draw();
 
-	TileIndex getTileToTerraform(bool heightState, bool checkUnplannedTerrain);
+	TileIndex getTileToTerraform(bool checkUnplannedTerrain, bool heightState);
 
 };
