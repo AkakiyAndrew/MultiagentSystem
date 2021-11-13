@@ -39,10 +39,10 @@ class Brigadier;
 class Digger: public Unit
 {
 private:
-	const int capacity = 20;
+	const int capacity = 150;
 	int cargoCurrent = 0;
-	const int heighPerOperation = 10;
-	const int operationTicksMax = 30;
+	const int heighPerOperation = 30;
+	const int operationTicksMax = 5;
 	int operationTicksLasts;
 
 	Brigadier* parent = nullptr;

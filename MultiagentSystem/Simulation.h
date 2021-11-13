@@ -16,6 +16,7 @@ private:
 	Map *map;
 	bool toolMode = true;
 	int toolRadius = 3;
+	bool isPaused = true;
 
 	Model diggerModel;
 	Model brigadierModel;

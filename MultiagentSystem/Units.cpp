@@ -1,7 +1,7 @@
 #include "Units.h"
 
 Unit::Unit(Vector3 position, Map* map, Model model)
-	:position(position), map(map), model(model), speed(0.25f), targetPosition(position)
+	:position(position), map(map), model(model), speed(0.5f), targetPosition(position)
 {
 	positionTile = map->getTileIndexFromVector(position);
 	targetPositionTile = positionTile;
@@ -94,7 +94,7 @@ void Digger::Scan()
 void Digger::Update()
 {
 	//in any state change y-axis (height)
-	position.y = map->getActualHeight(positionTile.x, positionTile.z) * 1.1;
+	position.y = position.y - (position.y - map->getActualHeight(positionTile.x, positionTile.z)) * 0.3f;
 
 	switch (state)
 	{
@@ -138,8 +138,6 @@ void Digger::Update()
 			switch (task)
 			{
 			case Task::GRAB:
-				//TODO: consider unplanned territory, where digger can grab or put without paying attention to zerolayer (limited only by map limitation)
-				//TODO: ÏÅÐÅÑÌÎÒÐÅÒÜ ËÈÌÈÒÛ: êàðòû, ¸ìêîñòè è ñêîëüêî ìîæíî âçÿòü/ïîëîæèòü çà ðàç
 				short heightMustDig, heightCanDig;
 
 				height = map->getHeight(positionTile.x, positionTile.z);

@@ -7,7 +7,7 @@ Map::Map(Shader shader, short zeroLayerHeight)
 
     length = image.height;
     width = image.width;
-    maxHeight = 16;
+    maxHeight = 64;
     sizeMultiplier = 1.f;
 
     textureTerraformPlan = LoadRenderTexture(width, length);
@@ -25,7 +25,7 @@ Map::Map(Shader shader, short zeroLayerHeight)
     
     zerolayerPlane = LoadModelFromMesh(GenMeshPlane(sizeMultiplier * width, sizeMultiplier * length, 1, 1));
     zerolayerPlane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, Fade(PURPLE, 0.25f)));
-    zerolayerPlanePosition = Vector3{ position.x + (width * sizeMultiplier) / 2, zeroLayerLevel * (maxHeight * sizeMultiplier / 255.f),position.z + width * sizeMultiplier / 2 };
+    zerolayerPlanePosition = Vector3{ position.x + (width * sizeMultiplier) / 2, zeroLayerLevel * (maxHeight * sizeMultiplier / 255.f) + 0.5f * sizeMultiplier,position.z + width * sizeMultiplier / 2 };
 
     //memory allocation
     heightMap = new short* [length];
@@ -239,9 +239,25 @@ RayCollision Map::getRayCollision(Ray ray)
     );
 }
 
+bool Map::isTerraformNeeded()
+{
+    return tilesTerraformed == tilesToTerraform;
+}
+
+int Map::getTilesToTerraform()
+{
+    return tilesToTerraform;
+}
+
+int Map::getTilesTerraformed()
+{
+    return tilesTerraformed;
+}
+
 void Map::planTerraform(Ray ray, int radius, bool state)
 {
     RayCollision collisionMesh = getRayCollision(ray);
+    bool previousState;
     
     if (collisionMesh.hit)
     {
@@ -260,17 +276,29 @@ void Map::planTerraform(Ray ray, int radius, bool state)
             {
                 if (CheckCollisionPointCircle(Vector2{ static_cast<float>(x), static_cast<float>(z) }, Vector2{ static_cast<float>(centerX), static_cast<float>(centerZ) }, radius))
                 {
+                    //TODO: make comparision between previous state and new one
                     terraformPlanMap[z][x] = state;
                     if (state)
                     {
                         if (heightMap[z][x] == zeroLayerLevel)
+                        {
                             DrawPixel(x, length - z - 1, GREEN);
+                            tilesTerraformed++;
+                            tilesToTerraform++;
+                        }   
                         else
+                        {
                             DrawPixel(x, length - z - 1, BLUE);
+                            tilesToTerraform++;
+                        }
                     }
                     else
+                    {
                         DrawPixel(x, length - z, RED);
-                    
+                        tilesToTerraform--;
+                        if (heightMap[z][x] == zeroLayerLevel)
+                            tilesTerraformed--;
+                    }
                 }
             }
         }

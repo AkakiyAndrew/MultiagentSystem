@@ -84,9 +84,21 @@ void Simulation::Update()
 
     if (IsKeyPressed(KEY_KP_ADD))
         toolRadius++;
-
     if (IsKeyPressed(KEY_KP_SUBTRACT))
         toolRadius--;
+
+    if (IsKeyPressed(KEY_ONE))
+        toolMode = true;
+    if (IsKeyPressed(KEY_TWO))
+        toolMode = false;
+
+    if (IsKeyPressed(KEY_SPACE))
+    {
+        if (isPaused)
+            isPaused = false;
+        else
+            isPaused = true;
+    }
 
     //if (IsKeyPressed(KEY_F))
     //{
@@ -117,7 +129,11 @@ void Simulation::Update()
     }
 
     //UNITS
-    brigadier->Update();
+    if (!isPaused)
+    {
+        brigadier->Update();
+    }
+    
 
     //if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
     //{
@@ -166,6 +182,12 @@ void Simulation::Draw()
     //minimap
     Texture minimap = map->getMinimapTexture();
     DrawTextureRec(minimap, Rectangle{ 0, 0, (float)minimap.width, (float)minimap.height }, Vector2{ 0, 0 }, WHITE);
+    DrawText(TextFormat("Tiles to terraform: %d", map->getTilesToTerraform()), 0.f, (float)minimap.height + 20.f, 20, BLACK);
+    DrawText(TextFormat("Tiles terraformed: %d", map->getTilesTerraformed()), 0.f, (float)minimap.height + 40.f, 20, BLACK);
+    if (map->isTerraformNeeded())
+        DrawText("Terraform complete.", 0.f, (float)minimap.height + 70.f, 20, VIOLET);
+    else
+        DrawText("Terraform initiated.", 0.f, (float)minimap.height + 70.f, 20, DARKGREEN);
 
     DrawFPS(screenWidth - 80, 30);
 

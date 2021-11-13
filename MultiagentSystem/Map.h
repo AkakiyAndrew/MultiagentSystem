@@ -21,6 +21,9 @@ class Map
 	bool terraformPlanDraw = false;
 	bool zerolayerPlaneDraw = false;
 
+	int tilesToTerraform = 0;
+	int tilesTerraformed = 0;
+
 public:
 	const short zeroLayerLevel;
 
@@ -40,6 +43,9 @@ public:
 	TileIndex getTileIndexFromVector(Vector3 position);
 	Vector3 getVectorFromTileIndex(TileIndex tile);
 	RayCollision getRayCollision(Ray ray);
+	bool isTerraformNeeded();
+	int getTilesToTerraform();
+	int getTilesTerraformed();
 
 	void switchTerraformDraw();
 	void switchZerolayerDraw();
