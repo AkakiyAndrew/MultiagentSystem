@@ -27,6 +27,7 @@ public:
 	 ~Unit();
 
 	Vector3 getPosition();
+	TileIndex getTargetPositionTile();
 	void setTargetPosition(Vector3 newTarget);
 
 	void Move();
@@ -58,10 +59,12 @@ public:
 
 class Brigadier : public Unit
 {
-	const int maxNumOfDiggers = 1;
+	const int maxNumOfDiggers = 10;
 
 	Digger **siblings = nullptr;
 
+	bool checkTileAssignments(TileIndex tile);
+	bool checkTileForTerraform(bool checkUnplannedTerrain, bool heightState, Map* map, int x, int z, short zeroLayerLevel);
 public:
 	Brigadier(Vector3 position, Map* map, Model model, Model diggerModel);
 	~Brigadier();

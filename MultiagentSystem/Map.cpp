@@ -3,19 +3,19 @@
 Map::Map(Shader shader, short zeroLayerHeight)
     :zeroLayerLevel(zeroLayerHeight)
 {
-    Image image = LoadImage("heightmap.png");
+    Image image = LoadImage("heightmap_0.png");
 
     length = image.height;
     width = image.width;
-    maxHeight = 32;
-    sizeMultiplier = 1.f;
+    maxHeight = 16;
+    sizeMultiplier = 2.f;
 
     textureTerraformPlan = LoadRenderTexture(width, length);
     BeginTextureMode(textureTerraformPlan);
         ClearBackground(RED);
     EndTextureMode();
 
-    texture = LoadTextureFromImage(image);                
+    texture = LoadTextureFromImage(image);
     mesh = GenMeshHeightmap(image, Vector3{ sizeMultiplier*width, maxHeight*sizeMultiplier, sizeMultiplier*length });    // Generate heightmap mesh (RAM and VRAM)
     position = Vector3{ 0.f, 0.0f, 0.f};
 

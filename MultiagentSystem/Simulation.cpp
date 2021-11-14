@@ -38,11 +38,11 @@ Simulation::Simulation(int screenWidth, int screenHeight)
 
     diggerModel = LoadModel("Digger.obj");
     diggerModel.materials[0].shader = lightShader;
-    diggerModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, BLUE));
+    diggerModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, RED));
 
     brigadierModel = LoadModel("Brigadier.obj");
     brigadierModel.materials[0].shader = lightShader;
-    brigadierModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, ORANGE));
+    brigadierModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTextureFromImage(GenImageColor(10, 10, YELLOW));
 
     Vector3 cubePosition = { 0.0f, 2.0f, 0.0f };
     Vector3 cubeSize = { 1.0f, 1.0f, 1.0f };
@@ -135,16 +135,16 @@ void Simulation::Update()
     }
     
 
-    //if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
-    //{
-    //    //ray = GetMouseRay(GetMousePosition(), customCamera->camera);
-    //    Ray ray = getRayFromCamera(customCamera->camera);
-    //    RayCollision collisionMesh = map->getRayCollision(ray);
-    //    if (collisionMesh.hit)
-    //    {
-    //        digger.setTargetPosition({ collisionMesh.point.x, 0, collisionMesh.point.z });
-    //    }
-    //}
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+    {
+        //ray = GetMouseRay(GetMousePosition(), customCamera->camera);
+        Ray ray = getRayFromCamera(customCamera->camera);
+        RayCollision collisionMesh = map->getRayCollision(ray);
+        if (collisionMesh.hit)
+        {
+            brigadier->setTargetPosition({ collisionMesh.point.x, 0, collisionMesh.point.z });
+        }
+    }
 }
 
 void Simulation::Draw()

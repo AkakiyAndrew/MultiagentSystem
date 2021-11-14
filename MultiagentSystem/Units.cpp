@@ -16,6 +16,11 @@ Vector3 Unit::getPosition()
 	return position;
 }
 
+TileIndex Unit::getTargetPositionTile()
+{
+	return targetPositionTile;
+}
+
 void Unit::setTargetPosition(Vector3 newTarget)
 {
 	targetPosition = newTarget;
@@ -268,6 +273,7 @@ Brigadier::Brigadier(Vector3 position, Map* map, Model model, Model diggerModel)
 {
 	state = State::IDLE;
 	isVisible = true;
+	speed = 0.25f;
 	siblings = new Digger * [maxNumOfDiggers];
 	for (int i = 0; i < maxNumOfDiggers; i++)
 		siblings[i] = new Digger(position, map, diggerModel, this);
@@ -311,7 +317,7 @@ void Brigadier::Draw()
 	{
 		// to shift model for rotation
 		model.transform = MatrixTranslate(-25.f, 0, -25.f);
-		DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.05f, 0.05f, 0.05f }, WHITE);
+		DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.1f, 0.1f, 0.1f }, WHITE);
 		//DrawSphere(position, 1, RED);
 	}
 
@@ -319,8 +325,22 @@ void Brigadier::Draw()
 		siblings[i]->Draw();
 }
 
+bool Brigadier::checkTileAssignments(TileIndex tile)
+{
+	bool result = true;
+
+	for (int i = 0; i < maxNumOfDiggers; i++)
+		if (siblings[i]->getTargetPositionTile() == tile)
+		{
+			result = false;
+			break;
+		}
+
+	return result;
+}
+
 //aux function for method below
-bool checkTileForTerraform(bool checkUnplannedTerrain, bool heightState, Map *map, int x, int z, short zeroLayerLevel)
+bool Brigadier::checkTileForTerraform(bool checkUnplannedTerrain, bool heightState, Map *map, int x, int z, short zeroLayerLevel)
 {
 	//если ищется в запланированной области:
 		// если ищется тайл выше зерослоя:
@@ -334,7 +354,6 @@ bool checkTileForTerraform(bool checkUnplannedTerrain, bool heightState, Map *ma
 		    // проверить, не равна ли высота тайла 255, и выдать тайл
 
 	//вернуть ничего
-
 
 	if (checkUnplannedTerrain)
 	{
@@ -426,28 +445,32 @@ TileIndex Brigadier::getTileToTerraform(bool checkUnplannedTerrain, bool heightS
 			for (int x = leftUp.x + 1, z = leftUp.z; x <= rightDown.x; x++)
 			{
 				if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
-					return TileIndex{ x,z };
+					if (checkTileAssignments(TileIndex{ x,z }))
+						return TileIndex{ x,z };
 			}
 
 			//right column
 			for (int x = rightDown.x, z = leftUp.z + 1; z <= rightDown.z; z++)
 			{
 				if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
-					return TileIndex{ x,z };
+					if (checkTileAssignments(TileIndex{ x,z }))
+						return TileIndex{ x,z };
 			}
 
 			//bottom row
 			for (int x = rightDown.x - 1, z = rightDown.z; x >= leftUp.x; x--)
 			{
 				if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
-					return TileIndex{ x,z };
+					if (checkTileAssignments(TileIndex{ x,z }))
+						return TileIndex{ x,z };
 			}
 
 			//left column
 			for (int x = leftUp.x, z = rightDown.z - 1; z >= leftUp.z; z--)
 			{
 				if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
-					return TileIndex{ x,z };
+					if (checkTileAssignments(TileIndex{ x,z }))
+						return TileIndex{ x,z };
 			}
 		}
 	}
