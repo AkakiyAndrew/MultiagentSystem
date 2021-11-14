@@ -245,7 +245,7 @@ RayCollision Map::getRayCollision(Ray ray)
 
 bool Map::isTerraformNeeded()
 {
-    return tilesTerraformed == tilesToTerraform;
+    return tilesTerraformed < tilesToTerraform;
 }
 
 int Map::getTilesToTerraform()

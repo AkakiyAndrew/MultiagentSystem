@@ -118,6 +118,10 @@ void Digger::Update()
 				break;
 			case Task::RETURN:
 				state = State::ATTACHED;
+				if (cargoCurrent != capacity)
+					task = Task::GRAB;
+				else
+					task = Task::PUT;
 				isVisible = false;
 				break;
 			}
@@ -252,7 +256,7 @@ void Digger::Draw()
 	{
 		// to shift model for rotation
 		model.transform = MatrixTranslate(-25.f, 0, -25.f);
-		DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.05f, 0.05f, 0.05f }, WHITE);
+		DrawModelEx(model, position, { 0, 1.f, 0 }, direction, { 0.02f, 0.02f, 0.02f }, WHITE);
 		//DrawSphere(position, 1, RED);
 	}
 }
@@ -379,68 +383,72 @@ bool checkTileForTerraform(bool checkUnplannedTerrain, bool heightState, Map *ma
 TileIndex Brigadier::getTileToTerraform(bool checkUnplannedTerrain, bool heightState)
 {
 	TileIndex result = { -1, -1 };
-	TileIndex center = positionTile;
-	TileIndex mapSize = map->getMapSize();
-	short zeroLayerLevel = map->getZeroLayerLevel();
-	int maxRadius = std::max<int>(
-		std::max<int>(center.x, mapSize.x - center.x - 1),
-		std::max<int>(center.z, mapSize.z - center.z - 1)
-		);
 
-	TileIndex leftUp, rightDown;
-
-	//checking current tile
-	if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, center.x, center.z, zeroLayerLevel))
-		return TileIndex{ center.x, center.z };
-
-	//TODO: add checking for assignments of other Diggers, who already got their targetTiles,
-	//to prevent sending them to only one tile
-	//OR
-	//make bool matrix for assignments
-
-	for (int r = 1; r <= maxRadius; r++)
+	if (map->isTerraformNeeded())
 	{
-		//leftUp
-		leftUp = {
-			center.x - r,
-			center.z - r
-		};
-		leftUp.x = std::clamp<int>(leftUp.x, 0, center.x);
-		leftUp.z = std::clamp<int>(leftUp.z, 0, center.z);
-		//rightDown
-		rightDown = {
-			center.x + r,
-			center.z + r
-		};
-		rightDown.x = std::clamp<int>(rightDown.x, center.x, mapSize.x - 1);
-		rightDown.z = std::clamp<int>(rightDown.z, center.z, mapSize.z - 1);
+		TileIndex center = positionTile;
+		TileIndex mapSize = map->getMapSize();
+		short zeroLayerLevel = map->getZeroLayerLevel();
+		int maxRadius = std::max<int>(
+			std::max<int>(center.x, mapSize.x - center.x - 1),
+			std::max<int>(center.z, mapSize.z - center.z - 1)
+			);
 
-		//upper row
-		for (int x = leftUp.x + 1, z = leftUp.z; x <= rightDown.x; x++)
-		{
-			if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
-				return TileIndex{ x,z };
-		}
+		TileIndex leftUp, rightDown;
 
-		//right column
-		for (int x = rightDown.x, z = leftUp.z + 1; z <= rightDown.z; z++)
-		{
-			if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
-				return TileIndex{ x,z };
-		}
+		//checking current tile
+		if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, center.x, center.z, zeroLayerLevel))
+			return TileIndex{ center.x, center.z };
 
-		//bottom row
-		for (int x = rightDown.x - 1, z = rightDown.z; x >= leftUp.x; x--)
-		{
-			if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
-				return TileIndex{ x,z };
-		}
+		//TODO: add checking for assignments of other Diggers, who already got their targetTiles,
+		//to prevent sending them to only one tile
+		//OR
+		//make bool matrix for assignments
 
-		//left column
-		for (int x = leftUp.x, z = rightDown.z - 1; z >= leftUp.z; z--)
+		for (int r = 1; r <= maxRadius; r++)
 		{
-			if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
-				return TileIndex{ x,z };
+			//leftUp
+			leftUp = {
+				center.x - r,
+				center.z - r
+			};
+			leftUp.x = std::clamp<int>(leftUp.x, 0, center.x);
+			leftUp.z = std::clamp<int>(leftUp.z, 0, center.z);
+			//rightDown
+			rightDown = {
+				center.x + r,
+				center.z + r
+			};
+			rightDown.x = std::clamp<int>(rightDown.x, center.x, mapSize.x - 1);
+			rightDown.z = std::clamp<int>(rightDown.z, center.z, mapSize.z - 1);
+
+			//upper row
+			for (int x = leftUp.x + 1, z = leftUp.z; x <= rightDown.x; x++)
+			{
+				if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
+					return TileIndex{ x,z };
+			}
+
+			//right column
+			for (int x = rightDown.x, z = leftUp.z + 1; z <= rightDown.z; z++)
+			{
+				if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
+					return TileIndex{ x,z };
+			}
+
+			//bottom row
+			for (int x = rightDown.x - 1, z = rightDown.z; x >= leftUp.x; x--)
+			{
+				if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
+					return TileIndex{ x,z };
+			}
+
+			//left column
+			for (int x = leftUp.x, z = rightDown.z - 1; z >= leftUp.z; z--)
+			{
+				if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, x, z, zeroLayerLevel))
+					return TileIndex{ x,z };
+			}
 		}
 	}
 
