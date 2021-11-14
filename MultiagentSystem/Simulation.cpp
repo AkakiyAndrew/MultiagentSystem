@@ -28,7 +28,7 @@ Simulation::Simulation(int screenWidth, int screenHeight)
     // Define our custom camera
     
     customCamera = new CustomCamera(
-        { 18.0f, 18.0f, 18.0f },
+        { 12.0f, 12.0f, 12.0f },
         { 9.f, 0.0f, 9.f },
         { 0.0f, 1.0f, 0.0f },
         45.0f,

@@ -7,7 +7,7 @@ Map::Map(Shader shader, short zeroLayerHeight)
 
     length = image.height;
     width = image.width;
-    maxHeight = 64;
+    maxHeight = 32;
     sizeMultiplier = 1.f;
 
     textureTerraformPlan = LoadRenderTexture(width, length);
@@ -111,7 +111,11 @@ void Map::setHeight(int x, int z, short height)
         if (terraformPlanMap[z][x] == true)
         {
             if (height == zeroLayerLevel)
+            {
                 DrawPixel(x, length - z - 1, GREEN);
+                tilesTerraformed++;
+            }
+                
             else
                 DrawPixel(x, length - z - 1, BLUE);
         }
@@ -277,27 +281,31 @@ void Map::planTerraform(Ray ray, int radius, bool state)
                 if (CheckCollisionPointCircle(Vector2{ static_cast<float>(x), static_cast<float>(z) }, Vector2{ static_cast<float>(centerX), static_cast<float>(centerZ) }, radius))
                 {
                     //TODO: make comparision between previous state and new one
+                    previousState = terraformPlanMap[z][x];
                     terraformPlanMap[z][x] = state;
-                    if (state)
+                    if (state != previousState)
                     {
-                        if (heightMap[z][x] == zeroLayerLevel)
+                        if (state)
                         {
-                            DrawPixel(x, length - z - 1, GREEN);
-                            tilesTerraformed++;
-                            tilesToTerraform++;
-                        }   
+                            if (heightMap[z][x] == zeroLayerLevel)
+                            {
+                                DrawPixel(x, length - z - 1, GREEN);
+                                tilesTerraformed++;
+                                tilesToTerraform++;
+                            }
+                            else
+                            {
+                                DrawPixel(x, length - z - 1, BLUE);
+                                tilesToTerraform++;
+                            }
+                        }
                         else
                         {
-                            DrawPixel(x, length - z - 1, BLUE);
-                            tilesToTerraform++;
+                            DrawPixel(x, length - z - 1, RED);
+                            tilesToTerraform--;
+                            if (heightMap[z][x] == zeroLayerLevel)
+                                tilesTerraformed--;
                         }
-                    }
-                    else
-                    {
-                        DrawPixel(x, length - z, RED);
-                        tilesToTerraform--;
-                        if (heightMap[z][x] == zeroLayerLevel)
-                            tilesTerraformed--;
                     }
                 }
             }
