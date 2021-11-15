@@ -2,8 +2,8 @@
 
 int main(void)
 {
-    const int screenWidth = 1000;
-    const int screenHeight = 500;
+    const int screenWidth = 1200;
+    const int screenHeight = 800;
 
     InitWindow(screenWidth, screenHeight, "terraform");
 

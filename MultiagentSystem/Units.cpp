@@ -152,6 +152,11 @@ void Digger::Update()
 				height = map->getHeight(positionTile.x, positionTile.z);
 				zeroLayerLevel = map->zeroLayerLevel;
 				tilePlanState = map->getTerraformPlanState(positionTile.x, positionTile.z);
+				if (height == 1 || (zeroLayerLevel > height && tilePlanState)) //to prevent crush
+				{
+					Scan();
+					return;
+				}
 
 				if (tilePlanState)
 				{
@@ -199,6 +204,11 @@ void Digger::Update()
 				short heightCanPut, heightMustPut;
 
 				height = map->getHeight(positionTile.x, positionTile.z);
+				if (height == 255) //to prevent crush
+				{
+					Scan();
+					return;
+				}
 				zeroLayerLevel = map->zeroLayerLevel;
 				tilePlanState = map->getTerraformPlanState(positionTile.x, positionTile.z);
 
@@ -325,6 +335,7 @@ void Brigadier::Draw()
 		siblings[i]->Draw();
 }
 
+//check, is tile assigned to any digger
 bool Brigadier::checkTileAssignments(TileIndex tile)
 {
 	bool result = true;
@@ -342,19 +353,6 @@ bool Brigadier::checkTileAssignments(TileIndex tile)
 //aux function for method below
 bool Brigadier::checkTileForTerraform(bool checkUnplannedTerrain, bool heightState, Map *map, int x, int z, short zeroLayerLevel)
 {
-	//если ищется в запланированной области:
-		// если ищется тайл выше зерослоя:
-			// проверить, выше ли тайл чем зерослой, и выдать его
-		// иначе - проверить, ниже ли тайл зерослоя, и выдать его
-	
-	// иначе:
-		//если нужно выкопать:
-			// проверять, выше ли высота чем 1, и выдать тайл
-		//иначе 
-		    // проверить, не равна ли высота тайла 255, и выдать тайл
-
-	//вернуть ничего
-
 	if (checkUnplannedTerrain)
 	{
 		if (checkUnplannedTerrain == map->getTerraformPlanState(x, z))
@@ -418,11 +416,6 @@ TileIndex Brigadier::getTileToTerraform(bool checkUnplannedTerrain, bool heightS
 		//checking current tile
 		if (checkTileForTerraform(checkUnplannedTerrain, heightState, map, center.x, center.z, zeroLayerLevel))
 			return TileIndex{ center.x, center.z };
-
-		//TODO: add checking for assignments of other Diggers, who already got their targetTiles,
-		//to prevent sending them to only one tile
-		//OR
-		//make bool matrix for assignments
 
 		for (int r = 1; r <= maxRadius; r++)
 		{

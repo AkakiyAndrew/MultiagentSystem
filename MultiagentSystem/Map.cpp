@@ -3,7 +3,7 @@
 Map::Map(Shader shader, short zeroLayerHeight)
     :zeroLayerLevel(zeroLayerHeight)
 {
-    Image image = LoadImage("heightmap_0.png");
+    Image image = LoadImage("heightmap.png");
 
     length = image.height;
     width = image.width;
