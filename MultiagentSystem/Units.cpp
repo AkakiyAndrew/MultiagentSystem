@@ -152,7 +152,9 @@ void Digger::Update()
 				height = map->getHeight(positionTile.x, positionTile.z);
 				zeroLayerLevel = map->zeroLayerLevel;
 				tilePlanState = map->getTerraformPlanState(positionTile.x, positionTile.z);
-				if (height == 1 || (zeroLayerLevel > height && tilePlanState)) //to prevent crush
+
+				//to prevent crush, caused by user, who used planning tool on tile, where digger meant to terraform
+				if (height == 1 || (zeroLayerLevel > height && tilePlanState))
 				{
 					Scan();
 					return;
@@ -204,13 +206,15 @@ void Digger::Update()
 				short heightCanPut, heightMustPut;
 
 				height = map->getHeight(positionTile.x, positionTile.z);
-				if (height == 255) //to prevent crush
+				zeroLayerLevel = map->zeroLayerLevel;
+				tilePlanState = map->getTerraformPlanState(positionTile.x, positionTile.z);
+
+				//to prevent crush, caused by user, who used planning tool on tile, where digger meant to terraform
+				if (height == 255 || (height > zeroLayerLevel && tilePlanState)) 
 				{
 					Scan();
 					return;
 				}
-				zeroLayerLevel = map->zeroLayerLevel;
-				tilePlanState = map->getTerraformPlanState(positionTile.x, positionTile.z);
 
 				if (tilePlanState)
 				{
@@ -219,7 +223,7 @@ void Digger::Update()
 				}
 				else
 				{
-					//otherwise dig down to 1 height or capacity
+					//otherwise put up to max height
 					heightPossible = std::clamp<short>(height + heighPerOperation, height, 255); //limit from current height to 255
 				}
 
