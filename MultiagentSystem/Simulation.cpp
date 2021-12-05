@@ -1,5 +1,6 @@
 #include "Simulation.h"
 
+//returns ray from camera pos to camera target
 Ray getRayFromCamera(Camera camera)
 {
     Ray result = { 0 };
@@ -100,32 +101,10 @@ void Simulation::Update()
             isPaused = true;
     }
 
-    //if (IsKeyPressed(KEY_F))
-    //{
-    //    digger.setTargetPosition({ 5,5,5 });
-    //}
-    //if (IsKeyPressed(KEY_G))
-    //{
-    //    digger.setTargetPosition({ 0,0,0 });
-    //}
-
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
     {
         Ray ray = getRayFromCamera(customCamera->camera);
         map->planTerraform(ray, toolRadius, toolMode);
-
-        // Check collision between ray and box
-        //RayCollision collisionBox = GetRayCollisionBox(ray,
-        //    BoundingBox{
-        //        Vector3{ cubePosition.x - cubeSize.x / 2, cubePosition.y - cubeSize.y / 2, cubePosition.z - cubeSize.z / 2 },
-        //        Vector3{ cubePosition.x + cubeSize.x / 2, cubePosition.y + cubeSize.y / 2, cubePosition.z + cubeSize.z / 2 }
-        //    });
-        //if (!collisionBox.hit)
-        //{
-        //    collisionBox.hit = false;
-        //    // if box isnt hitted - check collision with plane
-        //    map->planTerraform(ray, toolRadius, toolMode);
-        //}
     }
 
     //UNITS
@@ -134,10 +113,8 @@ void Simulation::Update()
         brigadier->Update();
     }
     
-
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
     {
-        //ray = GetMouseRay(GetMousePosition(), customCamera->camera);
         Ray ray = getRayFromCamera(customCamera->camera);
         RayCollision collisionMesh = map->getRayCollision(ray);
         if (collisionMesh.hit)
@@ -153,29 +130,11 @@ void Simulation::Draw()
 
     ClearBackground(RAYWHITE);
 
-    //if (camera.projection == CAMERA_ORTHOGRAPHIC) DrawText("ORTHOGRAPHIC", 10, 40, 20, BLACK);
-    //else if (camera.projection == CAMERA_PERSPECTIVE) DrawText("PERSPECTIVE", 10, 40, 20, BLACK);
-
     BeginMode3D(customCamera->camera);
-    /*DrawLine3D(Vector3{ 0.f, 0.f, 0.f }, Vector3{1.f, 0.f, 0.f}, DARKBLUE);*/
-    
+
     brigadier->Draw();
 
     map->Draw();
-
-    //digger.Draw();
-    //if (collisionBox.hit)
-    //{
-    //    DrawModel(cube, cubePosition, 1.f, RED);
-    //    DrawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON);
-    //    DrawCubeWires(cubePosition, cubeSize.x + 0.2f, cubeSize.y + 0.2f, cubeSize.z + 0.2f, GREEN);
-    //}
-    //else
-    //{
-    //    DrawModel(cube, cubePosition, 1.f, GRAY);
-    //    DrawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, DARKGRAY);
-    //}
-    //DrawRay(ray, MAROON);
 
     EndMode3D();
 
@@ -184,10 +143,10 @@ void Simulation::Draw()
     DrawTextureRec(minimap, Rectangle{ 0, 0, (float)minimap.width, (float)minimap.height }, Vector2{ 0, 0 }, WHITE);
     DrawText(TextFormat("Tiles to terraform: %d", map->getTilesToTerraform()), 0.f, (float)minimap.height + 20.f, 20, BLACK);
     DrawText(TextFormat("Tiles terraformed: %d", map->getTilesTerraformed()), 0.f, (float)minimap.height + 40.f, 20, BLACK);
-    if (map->isTerraformNeeded())
-        DrawText("Terraform complete.", 0.f, (float)minimap.height + 70.f, 20, VIOLET);
-    else
-        DrawText("Terraform initiated.", 0.f, (float)minimap.height + 70.f, 20, DARKGREEN);
+    //if (map->isTerraformNeeded())
+    //    DrawText("Terraform complete.", 0.f, (float)minimap.height + 70.f, 20, VIOLET);
+    //else
+    //    DrawText("Terraform initiated.", 0.f, (float)minimap.height + 70.f, 20, DARKGREEN);
 
     DrawFPS(screenWidth - 80, 30);
 

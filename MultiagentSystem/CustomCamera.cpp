@@ -49,14 +49,3 @@ void CustomCamera::Update()
 		camera.position.y += TURN_DEG * 20.0f;
 	}
 };
-
-//void CustomCamera::Render()
-//{
-//	BeginMode3D(camera);
-//	DrawGrid(100, 1.0f);
-//	EndMode3D();
-//
-//	DrawText(TextFormat("%i", GetMonitorHeight(0)), 100, 100, 50, RED);
-//	DrawText(TextFormat("%i", GetMouseY()), 100, 160, 50, RED);
-//	DrawText(TextFormat("%i", GetFPS()), 100, 210, 50, RED);
-//};

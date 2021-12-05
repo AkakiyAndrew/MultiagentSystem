@@ -9,29 +9,14 @@ int main(void)
 
     Simulation simulation = Simulation(screenWidth, screenHeight);
 
-    SetTargetFPS(60);                       // Set our game to run at 60 frames-per-second
+    SetTargetFPS(60);
 
-    // Main game loop
+    // Main loop
     while (!WindowShouldClose())
     {
-        /*if (IsKeyPressed(KEY_SPACE))
-        {
-            if (camera.getCamera().projection == CAMERA_PERSPECTIVE)
-            {
-                camera.fovy = WIDTH_ORTHOGRAPHIC;
-                camera.projection = CAMERA_ORTHOGRAPHIC;
-            }
-            else
-            {
-                camera.fovy = FOVY_PERSPECTIVE;
-                camera.projection = CAMERA_PERSPECTIVE;
-            }
-        }*/
-
         simulation.Update();
         simulation.Draw();
     }
-
 
     CloseWindow();
 
