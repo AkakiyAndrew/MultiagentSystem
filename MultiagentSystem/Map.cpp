@@ -155,6 +155,43 @@ void Map::setHeight(int x, int z, short height)
             mesh.vertices[vCounter + 1] = actualHeight;
         }
 
+        // Fill normals array with new data
+
+        //int nCounter = (z * xMax + x) * 18;
+        //Vector3 vA = { 0 };
+        //Vector3 vB = { 0 };
+        //Vector3 vC = { 0 };
+        //Vector3 vN = { 0 };
+
+        //for (int i = 0; i < 18; i += 9)
+        //{
+        //    vA.x = mesh.vertices[nCounter + i];
+        //    vA.y = mesh.vertices[nCounter + i + 1];
+        //    vA.z = mesh.vertices[nCounter + i + 2];
+
+        //    vB.x = mesh.vertices[nCounter + i + 3];
+        //    vB.y = mesh.vertices[nCounter + i + 4];
+        //    vB.z = mesh.vertices[nCounter + i + 5];
+
+        //    vC.x = mesh.vertices[nCounter + i + 6];
+        //    vC.y = mesh.vertices[nCounter + i + 7];
+        //    vC.z = mesh.vertices[nCounter + i + 8];
+
+        //    vN = Vector3Normalize(Vector3CrossProduct(Vector3Subtract(vB, vA), Vector3Subtract(vC, vA)));
+
+        //    mesh.normals[nCounter + i] = vN.x;
+        //    mesh.normals[nCounter + i + 1] = vN.y;
+        //    mesh.normals[nCounter + i + 2] = vN.z;
+
+        //    mesh.normals[nCounter + i + 3] = vN.x;
+        //    mesh.normals[nCounter + i + 4] = vN.y;
+        //    mesh.normals[nCounter + i + 5] = vN.z;
+
+        //    mesh.normals[nCounter + i + 6] = vN.x;
+        //    mesh.normals[nCounter + i + 7] = vN.y;
+        //    mesh.normals[nCounter + i + 8] = vN.z;
+        //}
+
         UpdateMeshBuffer(mesh, 0, mesh.vertices, sizeof(float) * mesh.vertexCount * 3, 0);
     }
     else
@@ -280,11 +317,12 @@ void Map::planTerraform(Ray ray, int radius, bool state)
             {
                 if (CheckCollisionPointCircle(Vector2{ static_cast<float>(x), static_cast<float>(z) }, Vector2{ static_cast<float>(centerX), static_cast<float>(centerZ) }, radius))
                 {
-                    //TODO: make comparision between previous state and new one
+ 
                     previousState = terraformPlanMap[z][x];
-                    terraformPlanMap[z][x] = state;
+                    
                     if (state != previousState)
                     {
+                        terraformPlanMap[z][x] = state;
                         if (state)
                         {
                             if (heightMap[z][x] == zeroLayerLevel)
