@@ -86,7 +86,12 @@ void Simulation::Update()
     if (IsKeyPressed(KEY_KP_ADD))
         toolRadius++;
     if (IsKeyPressed(KEY_KP_SUBTRACT))
+    {
         toolRadius--;
+        if (toolRadius < 1)
+            toolRadius = 1;
+    }
+        
 
     if (IsKeyPressed(KEY_ONE))
         toolMode = true;
